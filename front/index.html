@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fit Power</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <script src="dist/js/script.js"></script>
+    <link rel="stylesheet" href="dist/css/estilos.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="dist/assets/logos/logo.png" alt="Fit Power">
+        </div>
+        
+        <ul class="enlaces">
+            <li><a href="#" class="link activo" onclick="cambiarActivo(this)">Inicio</a></li>
+            <li><a href="#EmpiezaYa" class="link" onclick="cambiarActivo(this)">Empieza Ya</a></li>
+            <li><a href="#Programas" class="link" onclick="cambiarActivo(this)">Programas</a></li>
+            <li><a href="#Planes" class="link" onclick="cambiarActivo(this)">Planes</a></li>
+            <li><a href="#Staff" class="link" onclick="cambiarActivo(this)">Staff</a></li>
+            <li><a href="#NuestraHistoria" class="link" onclick="cambiarActivo(this)">Nuestra Historia</a></li>
+            <li><a href="#Contacto" class="link" onclick="cambiarActivo(this)">Contacto</a></li>
+            <li><a href="#Ubicacion" class="link" onclick="cambiarActivo(this)">Ubicación</a></li>
+        </ul>
+
+        <div class="iconos-nav">
+            <img src="dist/assets/imagenes/notificacion.png" alt="Notificaciones" class="icono-img" onclick="toggleNotificaciones()">
+        
+            <div id="caja-notificaciones" class="ventana-notis">
+                <div class="noti-header">
+                    <span>Notificaciones</span>
+                    <span class="noti-ajustes">⚙️</span>
+                </div>
+            
+                <div class="noti-lista">
+                    <div class="noti-item">
+                        <div class="noti-punto"></div>
+                        <img src="dist/assets/logos/logo.png" class="noti-avatar" alt="Avatar">
+                        <div class="noti-contenido">
+                            <p class="texto-noti"><b>Fit Power</b> subió un nuevo plan de entrenamiento semanal </p>
+                            <span class="noti-tiempo">hace 2 min</span>
+                        </div>
+                    </div>
+
+                    <div class="noti-item">
+                        <div class="noti-punto"></div>
+                        <img src="dist/assets/logos/logo.png" class="noti-avatar" alt="Avatar">
+                        <div class="noti-contenido">
+                            <p class="texto-noti">¡Tu pase mensual está listo para renovarse!</p>
+                            <span class="noti-tiempo">hace 1 hora</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buscador-caja">
+                <input type="text" placeholder="Buscar...">
+                <img src="dist/assets/imagenes/lupa.png" alt="Buscar" class="lupa-img">
+            </div>
+            <a href="dist/pages/login.html" class="btn-negro-link">Iniciar Sesión</a>
+            <a href="dist/pages/registro.html" class="btn-nav-asociarme">Registrarse</a>
+        </div> 
+    </nav> 
+
+    <header id="EmpiezaYa" class="contenedor-hero">
+        <div class="caja-borde">
+            <img src="dist/assets/imagenes/hero.jpg" alt="Fondo" class="heroimg">
+            
+            <div class="contenido-texto">
+                <h1 class="titulos">Empieza a <br><span class="verde-titulo">Cuidarte</span></h1>
+                <h2 class="subtitulo">Despierta tu potencial. Tu mejor versión te espera. Comienza tu viaje hoy.</h2>
+                
+                <div class="botones-hero">
+                    <button class="btn-degradado-ancho">Empezar ahora</button>
+                    <button class="btn-transparente">Más información</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="Programas" class="contenedor-programas">
+        <div class="caja-borde-programas">
+            <h2 class="titulo-programas">NUESTROS PROGRAMAS</h2>
+            
+            <div class="cuadricula-tarjetas">
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/boxeo.jpg" alt="Boxeo" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">BOXEO</h3>
+                        <a href="dist/pages/pagina1.html?programa=boxeo" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/musculacion.jpg" alt="Musculación" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">MUSCULACIÓN</h3>
+                        <a href="dist/pages/pagina1.html?programa=musculacion" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/crosstrainning.jpg" alt="Cross Training" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">CROSS TRAINING</h3>
+                        <a href="dist/pages/pagina1.html?programa=cross" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/spinning.jpg" alt="Spinning" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">SPINNING</h3>
+                        <a href="dist/pages/pagina1.html?programa=spinning" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/yoga.jpg" alt="Yoga" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">YOGA</h3>
+                        <a href="dist/pages/pagina1.html?programa=yoga" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/pilates.jpg" alt="Pilates" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">PILATES</h3>
+                        <a href="dist/pages/pagina1.html?programa=pilates" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/EntranamientoFuncional.jpg" alt="Entreno Funcional" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">ENTRENO FUNCIONAL</h3>
+                        <a href="dist/pages/pagina1.html?programa=funcional" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+
+                <div class="tarjeta-item">
+                    <img src="dist/assets/imagenes/natacion.jpg" alt="Natación" class="tarjeta-img">
+                    <div class="tarjeta-info">
+                        <h3 class="tarjeta-titulo">NATACIÓN</h3>
+                        <a href="dist/pages/pagina1.html?programa=natacion" class="btn-saber-mas">Saber más →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="Planes" class="contenedor-planes">
+        <div class="caja-borde-planes">
+            <div class="tarjeta-plan">
+                <h3 class="plan-titulo">Plan Básico</h3>
+                <div class="plan-precio">$1.800 <span class="plan-mes">/mes</span></div>
+                <ul class="plan-caracteristicas">
+                    <li>- 3 programas a elección</li>
+                    <li>- Ver todas las rutinas</li>
+                    <li>- Disponibilidad a soporte técnico</li>
+                </ul>
+                <button class="btn-elegir-plan">Elegir plan</button>
+            </div>
+
+            <div class="tarjeta-plan plan-destacado">
+                <h3 class="plan-titulo">Plan Pro</h3>
+                <div class="plan-precio">$2.500 <span class="plan-mes">/mes</span></div>
+                <ul class="plan-caracteristicas">
+                    <li>- Cuenta con entrenador propio</li>
+                    <li>- Acceso a todos los programas</li>
+                    <li>- Ajustes de rutinas por coach</li>
+                </ul>
+                <button class="btn-elegir-plan">Elegir plan</button>
+            </div>
+
+            <div class="tarjeta-plan">
+                <h3 class="plan-titulo">Plan Elite</h3>
+                <div class="plan-precio">$4.500 <span class="plan-mes">/mes</span></div>
+                <ul class="plan-caracteristicas">
+                    <li>- Acceso a todos los programas</li>
+                    <li>- Personalizar tus propias rutinas y cambios</li>
+                    <li>- Acceso a coach y soporte técnico</li>
+                </ul>
+                <button class="btn-elegir-plan">Elegir plan</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="Staff" class="contenedor-profesionales">
+        <div class="caja-borde-profesionales">
+            <h2 class="titulo-profesionales">Conocé a nuestros profesionales</h2>
+            
+            <div class="caja-slider-ventana">
+                <div class="slider-riel" id="riel-profesionales">
+                    <div class="bloque-entrenadores">
+                        <div class="tarjeta-profe">
+                            <div class="profe-foto-espacio"></div>
+                            <div class="profe-info">
+                                <span class="profe-nombre">Nombre</span>
+                                <span class="profe-especialidad">Yoga</span>
+                            </div>
+                        </div>
+                        <div class="tarjeta-profe">
+                            <div class="profe-foto-espacio"></div>
+                            <div class="profe-info">
+                                <span class="profe-nombre">Nombre</span>
+                                <span class="profe-especialidad">Fitness</span>
+                            </div>
+                        </div>
+                        <div class="tarjeta-profe">
+                            <div class="profe-foto-espacio"></div>
+                            <div class="profe-info">
+                                <span class="profe-nombre">Nombre</span>
+                                <span class="profe-especialidad">Natación</span>
+                            </div>
+                        </div>
+                        <div class="tarjeta-profe">
+                            <div class="profe-foto-espacio"></div>
+                            <div class="profe-info">
+                                <span class="profe-nombre">Nombre</span>
+                                <span class="profe-especialidad">Psicóloga</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bloque-entrenadores">
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Boxeo</span></div></div>
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Spinning</span></div></div>
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Crossfit</span></div></div>
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Pilates</span></div></div>
+                    </div>
+
+                    <div class="bloque-entrenadores">
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Funcional</span></div></div>
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Nutrición</span></div></div>
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Musculación</span></div></div>
+                        <div class="tarjeta-profe"><div class="profe-foto-espacio"></div><div class="profe-info"><span class="profe-nombre">Nombre</span><span class="profe-especialidad">Calistenia</span></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profe-paginacion">
+                <span class="punto-nav activo" onclick="moverSlider(0)"></span>
+                <span class="punto-nav" onclick="moverSlider(1)"></span>
+                <span class="punto-nav" onclick="moverSlider(2)"></span>
+            </div>
+        </div>
+    </section>
+
+    <section id="NuestraHistoria" class="contenedor-historia">
+        <div class="caja-borde-historia">
+            <div class="historia-imagenes">
+                <div class="columna-img-pildora">
+                    <img src="dist/assets/imagenes/historia1.jpg" alt="Inicio del gimnasio" class="img-pildora">
+                </div>
+                <div class="columna-img-pildora">
+                    <img src="dist/assets/imagenes/historia2.jpg" alt="Construcción del gimnasio" class="img-pildora">
+                </div>
+            </div>
+
+            <div class="historia-contenido">
+                <h2 class="titulo-historia">Nuestra historia</h2>
+                <p class="texto-historia">
+                    Ni vos ni nosotros empezamos siendo los mejores. 
+                    Este gimnasio lo creamos a base de esfuerzo, ganando 
+                    con sudor las bases para avanzar y fortalecernos. 
+                    Lo mismo lograrás en este espacio que te brindamos, 
+                    ganarás la fuerza, la motivación, te daremos el poder 
+                    de lograr tus metas.
+                </p>
+                <span class="subtitulo-historia">¡Te esperamos!</span>
+                <a href="#" class="btn-saber-mas-historia">Saber más →</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="Contacto" class="contenedor-contacto">
+        <div class="caja-borde-contacto">
+            <div class="contacto-info">
+                <h2 class="titulo-contacto">Contactanos</h2>
+                <p class="texto-contacto">
+                    Escribinos si tenés alguna duda, consulta o si estás listo para dar el primer paso hacia tus metas. Nuestro equipo te responderá lo antes posible.
+                </p>
+                
+                <div class="contacto-canales">
+                    <div class="canal-item">
+                        <a href="#" class="canal-link">
+                            <img src="dist/assets/imagenes/whatsapp.png" alt="Whatsapp" class="canal-icono-img">
+                        </a>
+                        <span class="canal-titulo text-verde">Whatsapp</span>
+                        <span class="canal-dato">+598 234 234</span>
+                    </div>
+
+                    <div class="canal-item">
+                        <a href="#" class="canal-link">
+                            <img src="dist/assets/imagenes/gmail.png" alt="Gmail" class="canal-icono-img">
+                        </a>
+                        <span class="canal-titulo text-verde">Gmail</span>
+                        <span class="canal-dato">ASds23@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contacto-formulario-wrapper">
+                <form class="formulario-contacto">
+                    <div class="fila-inputs">
+                        <input type="text" placeholder="Nombre" class="input-contacto" required>
+                        <input type="text" placeholder="Apellido" class="input-contacto" required>
+                    </div>
+                    <input type="email" placeholder="Email o Teléfono" class="input-contacto" required>
+                    <textarea placeholder="Mensaje" class="textarea-contacto" rows="5" required></textarea>
+                    <div class="contenedor-btn-formulario">
+                        <button type="submit" class="btn-enviar-contacto">Enviar comentario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="Ubicacion" class="contenedor-ubicacion">
+        <div class="caja-borde-ubicacion">
+            <div class="header-ubicacion">
+                <h2 class="titulo-ubicacion">Ubicación</h2>
+            </div>
+            <div class="mapa-wrapper">
+                <iframe 
+                    src="https://googleusercontent.com/maps.google.com/0" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    class="mapa-iframe">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-sitio">
+        <div class="footer-principal">
+            <div class="footer-columna">
+                <div class="footer-logo-box">
+                    <img src="dist/assets/logos/logo.png" alt="FIT POWER" class="footer-logo-img">
+                </div>
+                <p class="footer-eslogan">
+                    La mejor manera de entrenar tu body y mente.<br>
+                    Unetenos! No seas cobarde.
+                </p>
+                <div class="footer-redes">
+                    <a href="#" class="red-link"><img src="dist/assets/imagenes/facebook.png" alt="Facebook"></a>
+                    <a href="#" class="red-link"><img src="dist/assets/imagenes/instagram.png" alt="Instagram"></a>
+                    <a href="#" class="red-link"><img src="dist/assets/imagenes/whatsappF.png" alt="Whatsapp"></a>
+                </div>
+            </div>
+
+            <div class="footer-columna">
+                <h3 class="footer-nav-titulo color-verde">Servicios</h3>
+                <ul class="footer-enlaces">
+                    <li class="texto-blanco-footer">Ofrecemos...</li>
+                    <li class="texto-blanco-footer">Contamos con los mejores entrenadores y maquinaria...</li>
+                </ul>
+            </div>
+
+            <div class="footer-columna">
+                <h3 class="footer-nav-titulo color-verde">Textos Legales</h3>
+                <ul class="footer-enlaces">
+                    <li><a href="#">Politica de privacidad</a></li>
+                    <li><a href="#">Politica de cookies</a></li>
+                    <li><a href="#">Aviso legal</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-columna">
+                <h3 class="footer-nav-titulo color-azul">Suscripcion</h3>
+                <form class="form-suscripcion">
+                    <input type="text" placeholder="Nombre" class="input-footer" required>
+                    <input type="email" placeholder="Gmail" class="input-footer" required>
+                    <button type="submit" class="btn-suscribirme">SUSCRIBIRME</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-copyright">
+            <div class="caja-c-simbolo">
+                <p>© 2026 FIT POWER. Todos los derechos reservados. Desarrollado con pasión.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c> 
+    RewriteEngine On
+    # Redirige físicamente el navegador a la carpeta front
+    RewriteRule ^$ /front/index.html [R=301,L]
+</IfModule>
