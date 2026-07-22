@@ -1,0 +1,1027 @@
+/* ==========================================================================
+   1. CONFIGURACIÓN GENERAL Y RESET
+   ========================================================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #2A2A2A;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   2. BARRA DE NAVEGACIÓN (NAVBAR) - CORREGIDO
+   ========================================================================== */
+
+.navbar {
+    background-color: #000000;
+    display: flex;
+    align-items: center;       
+    justify-content: space-between;
+    padding: 0 40px;           
+    width: 100%;
+    height: 80px;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;       
+    height: 100%;
+}
+
+.logo img {
+    height: 75px; 
+    margin-left: -15px;  
+    margin-right: -15px; 
+    object-fit: contain;
+    display: block;
+}
+
+.enlaces {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+    align-items: center;       
+    margin: 0;
+    padding: 0;
+    height: 100%;             
+}
+
+.link {
+    color: #FFFFFF;
+    text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.link.activo, 
+.link:hover {
+    color: #AAFA64;
+}
+
+.iconos-nav {
+    display: flex;
+    align-items: center;       
+    gap: 15px;
+    position: relative; 
+    height: 100%;
+}
+
+.icono-img {
+    height: 24px;
+    cursor: pointer;
+}
+
+.btn-negro-link {
+    background-color: transparent;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-negro-link:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* ==========================================================================
+   3. SECCIÓN HERO (PORTADA)
+   ========================================================================== */
+
+.contenedor-hero {
+    display: block;    
+    clear: both;       
+    width: 100%;
+    height: calc(100vh - 80px); 
+    padding: 20px 40px;
+}
+
+.caja-borde {
+    width: 100%;
+    height: 100%;
+    border: 2px solid #AAFA64;
+    border-radius: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.heroimg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.contenido-texto {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 60px;
+    background: transparent; 
+}
+
+.titulos {
+    font-family: 'Syne', sans-serif;
+    font-size: 75px;
+    color: #FFFFFF;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.verde-titulo {
+    color: #AAFA64;
+}
+
+.subtitulo {
+    font-family: 'Space Grotesk', sans-serif;
+    color: #FFFFFF;
+    font-size: 20px;
+    max-width: 420px;
+    font-weight: 400;
+    margin-bottom: 30px;
+    line-height: 1.4;
+}
+
+.botones-hero {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-degradado-ancho {
+    background: linear-gradient(135deg, #46ECF4, #5DF64A);
+    border: none;
+    color: #000000;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.btn-degradado-ancho:hover {
+    transform: scale(1.05);
+}
+
+.btn-transparente {
+    background-color: transparent;
+    border: 2px solid #FFFFFF;
+    color: #FFFFFF;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   4. SECCIÓN PROGRAMAS
+   ========================================================================== */
+
+.contenedor-programas {
+    width: 100%;
+    padding: 20px 40px; 
+}
+
+.caja-borde-programas {
+    width: 100%;
+    background-color: #000000; 
+    border: 2px solid #AAFA64; 
+    border-radius: 45px; 
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titulo-programas {
+    font-family: 'Syne', sans-serif;
+    color: #AAFA64; 
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.cuadricula-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 20px; 
+    width: 100%;
+}
+
+.tarjeta-item {
+    position: relative;
+    height: 220px; 
+    border-radius: 30px; 
+    overflow: hidden;
+    background-color: transparent;
+}
+
+.tarjeta-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%); 
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.tarjeta-info {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    align-items: center;
+    padding: 20px 15px 15px 15px; 
+}
+
+.tarjeta-titulo {
+    font-family: 'Syne', sans-serif;
+    color: #FFFFFF;
+    font-size: 20px;
+    text-align: center;
+    letter-spacing: 2px;
+    background-color: rgba(53, 53, 53, 0.5); 
+    padding: 6px 20px; 
+    border-radius: 4px; 
+    margin-top: auto; 
+    margin-bottom: auto; 
+}
+
+.btn-saber-mas {
+    background: linear-gradient(135deg, #46ECF4, #5DF64A);
+    border: none;
+    color: #000000;
+    padding: 10px 32px;
+    border-radius: 25px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    font-size: 15px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    margin-top: auto; 
+    margin-bottom: 5px; 
+}
+
+.btn-saber-mas:hover {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   5. SECCIÓN PLANES
+   ========================================================================== */
+.contenedor-planes {
+    width: 100%;
+    padding: 20px 40px; 
+}
+
+.caja-borde-planes {
+    width: 100%;
+    background-color: #000000; 
+    border: 2px solid #64FAB5;
+    border-radius: 45px; 
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.caja-titulo-planes {
+    width: 100%;
+    padding: 10px 30px; 
+    display: flex;
+    justify-content: center;
+}
+
+.contenedor-tarjetas {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    gap: 30px;
+    width: 100%;
+    flex-wrap: wrap; 
+}
+
+.titulo-planes {
+    font-family: 'Syne', sans-serif;
+    color: #AAFA64; 
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.tarjeta-plan {
+    background-color: #222222; 
+    border: 2px solid rgba(100, 250, 181, 0.4); 
+    border-radius: 35px;
+    width: 300px; 
+    height: 450px; 
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; 
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.tarjeta-plan.plan-destacado {
+    border: 2.5px solid #64FAB5;
+    height: 490px; 
+    box-shadow: 0px 10px 30px rgba(100, 250, 181, 0.15);
+}
+
+.plan-titulo {
+    font-family: 'Syne', sans-serif;
+    color: #FFFFFF;
+    font-size: 28px;
+    text-align: center;
+}
+
+.plan-precio {
+    font-family: 'Space Grotesk', sans-serif;
+    color: #FFFFFF;
+    font-size: 36px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.plan-mes {
+    font-size: 14px;
+    color: #AAAAAA;
+    font-family: 'Inter', sans-serif;
+    font-weight: normal;
+}
+
+.plan-caracteristicas {
+    list-style: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.plan-caracteristicas li {
+    font-family: 'Inter', sans-serif;
+    color: #CCCCCC;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.btn-elegir-plan {
+    background: linear-gradient(135deg, #46ECF4, #5DF64A);
+    border: none;
+    color: #000000;
+    padding: 12px 35px;
+    border-radius: 25px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    width: 80%;
+    transition: transform 0.2s;
+}
+
+.btn-elegir-plan:hover {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   6. SECCIÓN STAFF (PROFESIONALES)
+   ========================================================================== */
+
+.contenedor-profesionales {
+    width: 100%;
+    padding: 20px 40px;
+}
+
+.caja-borde-profesionales {
+    width: 100%;
+    background-color: #000000;
+    border: 2px solid #64FAB5; 
+    border-radius: 45px;
+    padding: 50px 30px 30px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titulo-profesionales {
+    font-family: 'Syne', sans-serif;
+    color: #64FAB5;
+    font-size: 32px;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+}
+
+.caja-slider-ventana {
+    width: 100%;
+    overflow: hidden;
+}
+
+.slider-riel {
+    display: flex;
+    width: 300%; 
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+}
+
+.bloque-entrenadores {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 25px;
+    padding: 10px 5px;
+}
+
+.tarjeta-profe {
+    background-color: #222222;
+    background-size: cover;
+    background-position: center top; 
+    background-repeat: no-repeat;
+    border: 2px solid rgba(100, 250, 181, 0.3);
+    border-radius: 35px;
+    width: 24%; 
+    height: 420px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; 
+    padding: 25px 20px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+}
+
+.tarjeta-profe:hover {
+    transform: translateY(-5px);
+    border-color: #64FAB5;
+}
+
+.tarjeta-profe::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%; 
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+    z-index: 1;
+}
+
+.profe-info {
+    position: relative;
+    z-index: 2; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.profe-nombre, 
+.profe-especialidad {
+    font-family: 'Space Grotesk', sans-serif;
+    text-align: center;
+    padding: 4px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.profe-nombre {
+    color: #AAFA64;
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.profe-especialidad {
+    color: #FFFFFF;
+    font-size: 14px;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.profe-paginacion {
+    display: flex;
+    gap: 15px;
+    margin-top: 45px;
+}
+
+.punto-nav {
+    width: 12px;
+    height: 12px;
+    background-color: #FFFFFF; 
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.punto-nav.activo {
+    background-color: #64FAB5; 
+    transform: scale(1.2);
+}
+
+/* ==========================================================================
+   7. SECCIÓN NUESTRA HISTORIA
+   ========================================================================== */
+
+.contenedor-historia {
+    width: 100%;
+    min-height: 100vh; 
+    padding: 40px; 
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+}
+
+.caja-borde-historia {
+    width: 100%;
+    background-color: #000000;
+    border: 2px solid #64FAB5; 
+    border-radius: 45px;
+    padding: 60px 40px;
+    display: flex;
+    align-items: center;
+    gap: 50px; 
+}
+
+.historia-imagenes {
+    display: flex;
+    gap: 20px;
+    width: 40%; 
+}
+
+.columna-img-pildora {
+    flex: 1;
+    height: 460px; 
+    border-radius: 100px; 
+    overflow: hidden;
+    background-color: #111111;
+}
+
+.img-pildora {
+    width: 100%;
+    height: 100%;
+    object-fit: fill; 
+    filter: grayscale(100%) contrast(130%) brightness(85%); 
+    display: block;
+}
+
+.historia-contenido {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    text-align: left;
+    padding-left: 20px; 
+}
+
+.titulo-historia {
+    font-family: 'Syne', sans-serif;
+    color: #64FAB5;
+    font-size: 36px;
+    letter-spacing: 1px;
+    margin: 0 0 25px 0; 
+    display: block;
+}
+
+.texto-historia {
+    font-family: 'Inter', sans-serif;
+    color: #FFFFFF;
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    max-width: 95%;
+}
+
+.subtitulo-historia {
+    font-family: 'Inter', sans-serif;
+    color: #AAFA64; 
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+.btn-saber-mas-historia {
+    background: linear-gradient(135deg, #46ECF4, #5DF64A);
+    border: none;
+    color: #000000;
+    padding: 12px 35px;
+    border-radius: 25px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.btn-saber-mas-historia:hover {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   8. SECCIÓN CONTACTO
+   ========================================================================== */
+
+.contenedor-contacto {
+    width: 100%;
+    min-height: 100vh; 
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.caja-borde-contacto {
+    width: 100%;
+    background-color: #000000;
+    border: 2px solid #64FAB5; 
+    border-radius: 45px;
+    padding: 60px 50px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-top:70px ;
+}
+
+.contacto-info {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.titulo-contacto {
+    font-family: 'Syne', sans-serif;
+    color: #64FAB5;
+    font-size: 38px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.texto-contacto {
+    font-family: 'Inter', sans-serif;
+    color: #FFFFFF;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400; 
+    margin-bottom: 40px;
+}
+
+.contacto-canales {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+}
+
+.canal-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.text-verde {
+    color: #64FAB5;
+}
+
+.canal-titulo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.canal-dato {
+    font-family: 'Inter', sans-serif;
+    color: #FFFFFF;
+    font-size: 13px;
+}
+
+.canal-link {
+    display: inline-block;
+    transition: transform 0.2s;
+    margin-bottom: 10px;
+}
+
+.canal-link:hover {
+    transform: scale(1.1); 
+}
+
+.canal-icono-img {
+    width: 36px;  
+    height: 36px;
+    object-fit: contain;
+}
+
+.contacto-formulario-wrapper {
+    width: 65%;
+    background-color: #222222; 
+    border: 2px solid rgba(100, 250, 181, 0.3); 
+    border-radius: 35px;
+    padding: 50px 40px;
+}
+
+.formulario-contacto {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.fila-inputs {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.fila-inputs .input-contacto {
+    width: 50%;
+}
+
+.input-contacto, 
+.textarea-contacto {
+    width: 100%;
+    background-color: #333333; 
+    border: 1.5px solid rgba(100, 250, 181, 0.4);
+    border-radius: 20px;
+    padding: 16px 25px;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.textarea-contacto {
+    border-radius: 25px;
+    resize: none; 
+}
+
+.input-contacto:focus, 
+.textarea-contacto:focus {
+    border-color: #64FAB5; 
+}
+
+.input-contacto::placeholder, 
+.textarea-contacto::placeholder {
+    color: #888888;
+}
+
+.contenedor-btn-formulario {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.btn-enviar-contacto {
+    background: linear-gradient(135deg, #46ECF4, #5DF64A);
+    border: none;
+    color: #000000;
+    padding: 12px 45px;
+    border-radius: 25px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-enviar-contacto:hover {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   9. SECCIÓN UBICACIÓN (MAPA)
+   ========================================================================== */
+
+.contenedor-ubicacion {
+    width: 100%;
+    min-height: 100vh; 
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.caja-borde-ubicacion {
+    width: 100%;
+    background-color: #000000;
+    border: 2px solid #64FAB5; 
+    border-radius: 45px;
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+}
+
+.header-ubicacion {
+    width: 100%;
+    background-color: #000000;
+    padding: 30px 0;
+    text-align: center;
+    border-bottom: 2px solid rgba(100, 250, 181, 0.3); 
+}
+
+.titulo-ubicacion {
+    font-family: 'Syne', sans-serif;
+    color: #64FAB5;
+    font-size: 38px;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.mapa-wrapper {
+    width: 100%;
+    height: 480px; 
+    background-color: #111111;
+    position: relative;
+}
+
+.mapa-iframe {
+    filter: invert(90%) hue-rotate(180deg) grayscale(100%) brightness(40%) contrast(120%);
+}
+
+/* ==========================================================================
+   10. PIE DE PÁGINA (FOOTER)
+   ========================================================================== */
+
+.footer-sitio {
+    width: 100%;
+    background-color: #000000;
+    padding-top: 60px;
+    border-top: 2px solid rgba(100, 250, 181, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-principal {
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 40px 40px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.footer-columna {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.footer-logo-img {
+    height: 85px; 
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 20px; 
+}
+
+.footer-eslogan {
+    font-family: 'Inter', sans-serif;
+    color: #FFFFFF;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.footer-redes {
+    display: flex;
+    gap: 15px;
+}
+
+.red-link img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    transition: transform 0.2s;
+}
+
+.red-link:hover img {
+    transform: scale(1.15);
+}
+
+.footer-nav-titulo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.color-verde { color: #64FAB5; }
+.color-azul { color: #46ECF4; }
+
+.footer-enlaces {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-enlaces li {
+    font-family: 'Inter', sans-serif;
+    color: #888888;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.footer-enlaces li a {
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-enlaces li.texto-blanco-footer {
+    color: #FFFFFF !important;
+}
+
+.footer-enlaces li a:hover {
+    color: #64FAB5;
+}
+
+.form-suscripcion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.input-footer {
+    width: 100%;
+    background-color: #333333;
+    border: 1px solid #444444;
+    border-radius: 10px;
+    padding: 10px 15px;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+}
+
+.input-footer::placeholder { color: #888888; }
+
+.footer-copyright {
+    width: 100%;
+    background-color: #111111; 
+    padding: 25px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.caja-c-simbolo p {
+    font-family: 'Inter', sans-serif;
+    color: #666666;
+    font-size: 13px;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
