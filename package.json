@@ -1,0 +1,9 @@
+{
+  "name": "proyecto-frontend",
+  "devDependencies": {
+    "sass": "^1.60.0"
+  },
+  "scripts": {
+    "watch": "sass --watch front/src/scss:front/dist/css"
+  }
+}
