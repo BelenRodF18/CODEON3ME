@@ -31,7 +31,7 @@ require_once 'config/database.php';
 // 4. Intentar conexión aislada
 try {
     $db = (new Database())->getConnection();
-} catch (Exception $e) {
+} catch (Throwable $e) {
     ob_clean();
     error_log('DB connection failed: ' . $e->getMessage());
     http_response_code(500);
@@ -48,14 +48,8 @@ try {
     exit;
 }
 
-// ==============================================================================
-// LÓGICA HÍBRIDA DE ENRUTAMIENTO (Local vs Producción)
-// ==============================================================================
-// Si estamos en local, la URL web contiene la subcarpeta.
-// Si estamos en producción (NGINX), la URL web siempre empieza desde /api.
-$isLocal = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false);
-
-$base = $isLocal ? '/URBE-API-DRIVEN/api' : '/api';
+// En Docker Apache la API vive en http://localhost:8080/api
+$base = '/api';
 
 // Instanciamos el router inyectando el base path correcto y la DB
 $router = new \App\Utils\Router($base, $db);

@@ -1,24 +1,22 @@
-
+version: '3.8'
 
 services:
 
-  # Servidor Web + PHP
+  # Servidor Web + PHP (front + api)
   app:
-    image: php:8.2-apache
-    container_name: mvc_php_app
+    build: .
+    container_name: ${APP_NAME}_app
     ports:
       - "8080:80"
     volumes:
       - ./:/var/www/html
-    #  Activa el módulo y luego inicia Apache en primer plano
-    command: bash -c "a2enmod rewrite && apache2-foreground"
     depends_on:
       - db
 
   # Base de Datos MySQL
   db:
     image: mysql:8.0
-    container_name: mvc_mysql_db
+    container_name: ${APP_NAME}_db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root_password
@@ -29,11 +27,12 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./api/config/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   # Interfaz gráfica para MySQL
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: mvc_phpmyadmin
+    container_name: ${APP_NAME}_phpmyadmin
     ports:
       - "8081:80"
     environment:
