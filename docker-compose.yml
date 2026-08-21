@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   # Servidor Web + PHP (front + api)
@@ -8,6 +6,11 @@ services:
     container_name: ${APP_NAME}_app
     ports:
       - "8080:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
     volumes:
       - ./:/var/www/html
     depends_on:
@@ -19,10 +22,10 @@ services:
     container_name: ${APP_NAME}_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: mi_base_de_datos
-      MYSQL_USER: usuario
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
     ports:
       - "3306:3306"
     volumes:

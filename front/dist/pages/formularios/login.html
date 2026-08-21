@@ -30,8 +30,8 @@
 
                 <form id="form-login" class="formulario-auth text-start">
                     <div class="grupo-input mb-3">
-                        <label for="username" class="form-label">Nombre de Usuario</label>
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Ingrese su usuario" required>
+                        <label for="username" class="form-label">Email</label>
+                        <input type="email" id="username" name="email" class="form-control" placeholder="usuario@fitpower.com" required>
                     </div>
 
                     <div class="grupo-input mb-3">
@@ -39,14 +39,7 @@
                         <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
                     </div>
 
-                    <div class="grupo-input mb-4">
-                        <label for="user-role" class="form-label">Tipo de Cuenta / Rol</label>
-                        <select id="user-role" class="form-select">
-                            <option value="socio">Socio / Cliente</option>
-                            <option value="entrenador">Entrenador Staff</option>
-                            <option value="admin">Administrador General</option>
-                        </select>
-                    </div>
+                    <div id="mensaje-login" class="text-danger small mb-3" style="display:none;"></div>
 
                     <div class="contenedor-botones-auth">
                         <button type="submit" class="btn-degradado-auth w-100">Iniciar Sesión</button>
@@ -63,15 +56,48 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmxc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
     <script>
-        document.getElementById('form-login').addEventListener('submit', function(e) {
+        document.getElementById('form-login').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const rol = document.getElementById('user-role').value;
-            if (rol === 'socio') {
-                window.location.href = "../dashboard/socio/dashboard-socio.html";
-            } else if (rol === 'entrenador') {
-                window.location.href = "../dashboard/entrenador/dashboard-entrenador.html";
-            } else if (rol === 'admin') {
-                window.location.href = "../dashboard/admin/dashboard-admin.html";
+
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const mensaje = document.getElementById('mensaje-login');
+
+            mensaje.style.display = 'none';
+            mensaje.textContent = '';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || data.status !== 'success') {
+                    mensaje.textContent = data.message || 'Credenciales inválidas';
+                    mensaje.style.display = 'block';
+                    return;
+                }
+
+                const rol = data.usuario.rol;
+
+                if (rol === 'admin') {
+                    window.location.href = '../dashboard/admin/dashboard-admin.html';
+                } else if (rol === 'entrenador') {
+                    window.location.href = '../dashboard/entrenador/dashboard-entrenador.html';
+                } else if (rol === 'socio') {
+                    window.location.href = '../dashboard/socio/dashboard-socio.html';
+                } else {
+                    mensaje.textContent = 'Rol no reconocido';
+                    mensaje.style.display = 'block';
+                }
+            } catch (error) {
+                mensaje.textContent = 'No se pudo conectar con la API';
+                mensaje.style.display = 'block';
             }
         });
     </script>
