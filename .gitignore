@@ -88,9 +88,8 @@ composer.phar
 .phpunit.result.cache
 
 # ==========================================
-# 5. COMPILACIÓN / COMPILADORES / BUILD OUT (Dist/Build)
+# 5. OTROS ARTEFACTOS DE COMPILACIÓN
 # ==========================================
-dist/
 build/
 out/
 .next/
@@ -100,8 +99,6 @@ out/
 .parcel-cache/
 .turbo/
 .vite/
-
-# Archivos temporales de TypeScript y Rollup
 *.tsbuildinfo
 .rollup.cache/
 
@@ -144,8 +141,6 @@ storage/logs/
 
 
 # Archivos subidos por usuarios / Media local de prueba
-front/dist/assets/imagenes/
-front/dist/assets/videos/
 **/uploads/
 *.mp4
 *.mkv
