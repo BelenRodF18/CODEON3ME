@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal del socio | Fit Power</title>
+    <link rel="icon" type="image/png" href="../../../assets/logos/logo.png">
+    <link rel="stylesheet" href="../../../css/socio.css">
+</head>
+<body class="socio-app">
+    <div class="socio-shell">
+        <aside class="socio-sidebar">
+            <div class="socio-brand"><img src="../../../assets/logos/logo.png" alt="Fit Power"><small>Portal del socio</small></div>
+            <nav class="socio-nav" aria-label="Secciones del portal">
+                <button class="active" data-view="inicio"><span>01</span> Inicio</button>
+                <button data-view="rutinas"><span>02</span> Mis rutinas</button>
+                <button data-view="acceso"><span>03</span> Mi acceso</button>
+                <button data-view="rendimiento"><span>04</span> Rendimiento</button>
+                <button data-view="mantenimiento"><span>05</span> Contactar al equipo</button>
+            </nav>
+            <button class="socio-logout" id="cerrar-sesion">Cerrar sesión</button>
+        </aside>
+
+        <main class="socio-main">
+            <header class="socio-topbar">
+                <div><div class="socio-kicker">Tu espacio de entrenamiento</div><h1 id="saludo">Hola, socio</h1></div>
+                <div class="socio-avatar" id="avatar">SP</div>
+            </header>
+
+            <section class="socio-view active" id="view-inicio">
+                <div class="socio-grid">
+                    <article class="socio-card wide"><div class="socio-status"><div><h3>Estado de tu membresía</h3><div id="membresia-plan" class="socio-meta">Cargando plan...</div><div id="membresia-fecha" class="socio-date">--</div></div><span id="membresia-estado" class="status-pill ok">Consultando</span></div><p id="membresia-mensaje" class="socio-meta"></p></article>
+                    <article class="socio-card"><h3>Afluencia ahora</h3><div id="aforo" class="socio-date">--</div><p>Personas registradas en las últimas horas.</p><button class="socio-button secondary" data-go="acceso">Ver mi QR</button></article>
+                    <article class="socio-card full"><div class="socio-status"><div><h3>Rutinas nuevas de Carlos</h3><p>Tu entrenador dejó trabajo listo para hoy.</p></div><button class="socio-button" data-go="rutinas">Abrir rutinas</button></div><div id="home-rutinas" class="routine-list"></div></article>
+                </div>
+            </section>
+
+            <section class="socio-view" id="view-rutinas">
+                <div class="socio-section"><div class="socio-kicker">Entrenamiento</div><h2>Mis rutinas</h2><p class="socio-meta">Selecciona una rutina para ver los ejercicios, series y descansos.</p></div>
+                <article class="socio-card full workout-clock">
+                    <div class="socio-status"><div><h3>Cronómetro de entrenamiento</h3><p>Úsalo para medir una serie o tu descanso entre ejercicios.</p></div><span id="workout-timer-state" class="tag">Listo</span></div>
+                    <strong id="workout-timer-value" class="workout-timer-value">00:00</strong>
+                    <div class="workout-timer-controls">
+                        <label class="timer-duration">Minutos <input id="workout-minutes" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="1" autocomplete="off"></label>
+                        <label class="timer-duration">Segundos <input id="workout-seconds" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="30" autocomplete="off"></label>
+                        <button id="workout-start" class="socio-button" type="button">Iniciar</button>
+                        <button id="workout-pause" class="socio-button secondary" type="button">Pausar</button>
+                        <button id="workout-reset" class="socio-button secondary" type="button">Reiniciar</button>
+                    </div>
+                </article>
+                <div id="rutinas-list" class="routine-list" style="margin-top:20px"></div>
+            </section>
+
+            <section class="socio-view" id="view-acceso">
+                <div class="socio-section"><div class="socio-kicker">Entrada rápida</div><h2>Mi acceso</h2><p class="socio-meta">Tu código se renueva cada minuto y solo puede utilizarse una vez.</p></div>
+                <article class="socio-card full" style="margin-top:20px"><div class="qr-layout"><div><div id="qr-code" class="qr-box"><span style="color:#111">Generando...</span></div><div id="qr-countdown" class="qr-count">--</div></div><div><h3>Listo para entrenar</h3><p>Presenta este código en el molinete. El sistema comprueba tu membresía antes de habilitar la entrada.</p><button id="refresh-qr" class="socio-button" style="margin-top:18px">Generar nuevo código</button><p id="qr-message" class="socio-meta" style="margin-top:13px"></p></div></div></article>
+            </section>
+
+            <section class="socio-view" id="view-rendimiento">
+                <div class="socio-section"><div class="socio-kicker">Progreso real</div><h2>Rendimiento</h2><p class="socio-meta">Registra tus series y construye tu historial de fuerza.</p></div>
+                <div class="socio-grid" style="margin-top:20px"><article class="socio-card wide"><h3>Historial de series</h3><div id="series-list"></div></article><article class="socio-card"><h3>Registrar serie</h3><form id="serie-form" class="form-grid"><div class="field full"><label for="serie-ejercicio">Ejercicio</label><select id="serie-ejercicio" required></select></div><div class="field"><label for="serie-peso">Peso (kg)</label><input id="serie-peso" type="number" min="0" step="0.5" required></div><div class="field"><label for="serie-reps">Repeticiones</label><input id="serie-reps" type="number" min="1" required></div><div class="field"><label for="serie-descanso">Descanso (seg)</label><input id="serie-descanso" type="number" min="10" max="600" value="90" required></div><div class="field full"><label for="serie-sensacion">Sensación</label><input id="serie-sensacion" placeholder="Fácil, intensa, al límite..."></div><button class="socio-button full" type="submit">Guardar y comenzar descanso</button></form><div id="timer" class="timer" hidden><span>Descanso</span><strong id="timer-value">01:30</strong><button id="stop-timer" class="socio-button secondary">Detener</button></div></article></div>
+            </section>
+
+            <section class="socio-view" id="view-mantenimiento">
+                <div class="socio-section"><div class="socio-kicker">Comunicación directa</div><h2>Contactar al equipo</h2><p class="socio-meta">Reporta un problema de la sala o envía una sugerencia al administrador.</p></div>
+                <div class="socio-grid" style="margin-top:20px"><article class="socio-card"><h3>Nueva conversación</h3><form id="reporte-form" class="form-grid"><div class="field full"><label for="reporte-tipo">Tipo de mensaje</label><select id="reporte-tipo"><option value="mantenimiento">Reportar problema de máquina</option><option value="sugerencia">Enviar sugerencia al administrador</option></select></div><div class="field full"><label for="reporte-etiqueta">Asunto</label><select id="reporte-etiqueta"><option>Polea rota</option><option>Máquina sucia</option><option>Pantalla apagada</option><option>Idea para mejorar el gimnasio</option><option>Otro</option></select></div><div class="field full"><label for="reporte-descripcion">Descripción</label><textarea id="reporte-descripcion" required placeholder="Cuéntanos qué ocurre o qué propones"></textarea></div><div class="field full" id="foto-field"><label for="reporte-foto">Foto (opcional para problemas)</label><input id="reporte-foto" type="file" accept="image/jpeg,image/png,image/webp"></div><button class="socio-button full" type="submit" id="reporte-submit">Enviar conversación</button></form></article><article class="socio-card wide"><h3>Mis conversaciones</h3><div id="reportes-list" class="report-list"></div></article></div>
+            </section>
+        </main>
+    </div>
+    <div id="toast" class="toast" role="status"></div>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="../../../js/socio-rendimiento.js"></script>
+    <script>
+        const state = { me: null, timer: null, qrTimer: null, qrSeconds: 0, workoutTimer: null, workoutRemaining: 0, workoutRunning: false };
+        const $ = (id) => document.getElementById(id);
+        const api = async (path, options = {}) => { const response = await fetch('/api' + path, options); const data = await response.json(); if (!response.ok) throw new Error(data.message || 'No se pudo completar la operación'); return data; };
+        const toast = (message) => { $('toast').textContent = message; $('toast').classList.add('show'); setTimeout(() => $('toast').classList.remove('show'), 3000); };
+        const go = (view) => { document.querySelectorAll('.socio-view').forEach((el) => el.classList.toggle('active', el.id === 'view-' + view)); document.querySelectorAll('.socio-nav button').forEach((el) => el.classList.toggle('active', el.dataset.view === view)); if (view === 'acceso') makeQr(); if (view === 'mantenimiento') loadReports(); if (view === 'rendimiento') loadPerformance(); };
+        document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => go(button.dataset.view)));
+        document.querySelectorAll('[data-go]').forEach((button) => button.addEventListener('click', () => go(button.dataset.go)));
+        const formatDate = (value) => value ? new Date(value + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }) : '--';
+        const renderRoutine = (routine) => `<div class="routine-item"><div class="routine-head"><strong>${routine.nombre}</strong><small>${routine.entrenador || 'Equipo Fit Power'}</small></div><p class="socio-meta">${routine.descripcion || 'Rutina personalizada para ti.'}</p><div class="exercise-list">${(routine.ejercicios || []).map((exercise) => `<div class="exercise-row"><span>${exercise.nombre}</span><span>${exercise.series} x ${exercise.repeticiones} · ${exercise.descanso_segundos}s</span></div>`).join('') || '<div class="empty">Tu entrenador aún está cargando los ejercicios.</div>'}</div></div>`;
+        const bindRoutineToggle = () => document.querySelectorAll('.routine-item').forEach((item) => item.addEventListener('click', () => item.classList.toggle('open')));
+        const loadDashboard = async () => { const data = await api('/socio/resumen'); const user = state.me.usuario; $('saludo').textContent = 'Hola, ' + user.nombre.split(' ')[0]; $('avatar').textContent = user.nombre.split(' ').map((part) => part[0]).slice(0, 2).join(''); const membership = data.membresia; $('membresia-plan').textContent = membership ? `${membership.plan} · Entrenador/a ${membership.entrenador || 'por asignar'}` : 'Sin membresía registrada'; $('membresia-fecha').textContent = membership ? 'Hasta ' + formatDate(membership.fecha_vencimiento) : '--'; const isOk = membership && membership.estado === 'al_dia'; $('membresia-estado').textContent = isOk ? 'Al día' : 'Revisar estado'; $('membresia-estado').className = 'status-pill ' + (isOk ? 'ok' : 'warn'); $('membresia-mensaje').textContent = isOk ? 'Tu acceso está habilitado para entrenar este mes.' : 'Acércate a recepción para renovar tu membresía.'; $('aforo').textContent = data.aforo + ' personas'; $('home-rutinas').innerHTML = data.rutinas.map(renderRoutine).join('') || '<div class="empty">Todavía no tienes rutinas asignadas.</div>'; bindRoutineToggle(); const routines = await api('/socio/rutinas'); $('rutinas-list').innerHTML = routines.rutinas.map(renderRoutine).join('') || '<div class="empty">Todavía no tienes rutinas asignadas.</div>'; bindRoutineToggle(); };
+        const makeQr = async () => { try { const data = await api('/socio/qr'); $('qr-code').innerHTML = ''; new QRCode($('qr-code'), { text: data.token, width: 185, height: 185, colorDark: '#0a0d0b', colorLight: '#ffffff' }); state.qrSeconds = 60; $('qr-message').textContent = 'Código listo para presentar en recepción.'; clearInterval(state.qrTimer); state.qrTimer = setInterval(() => { state.qrSeconds -= 1; $('qr-countdown').textContent = state.qrSeconds > 0 ? `Se renueva en ${state.qrSeconds}s` : 'Renovando...'; if (state.qrSeconds <= 0) makeQr(); }, 1000); } catch (error) { $('qr-message').textContent = error.message; } };
+        const loadPerformance = async () => { const data = await api('/socio/rendimiento'); $('serie-ejercicio').innerHTML = data.ejercicios.map((exercise) => `<option value="${exercise.id}">${exercise.nombre}</option>`).join(''); $('series-list').innerHTML = data.series.length ? '<div class="chart-row"><strong>Ejercicio</strong><strong>Peso</strong><strong>Reps</strong><strong>Fecha</strong></div>' + data.series.map((series) => `<div class="chart-row"><span>${series.ejercicio}</span><strong>${series.peso} kg</strong><span>${series.repeticiones}</span><span>${series.fecha}</span></div>`).join('') : '<div class="empty">Registra tu primera serie para comenzar el historial.</div>'; };
+        const loadReports = async () => { const data = await api('/socio/reportes'); $('reportes-list').innerHTML = data.reportes.length ? data.reportes.map((report) => `<div class="report-item"><header><strong>${report.tipo === 'sugerencia' ? 'Sugerencia: ' : ''}${report.etiqueta}</strong><span class="tag ${report.tipo === 'sugerencia' ? 'suggestion' : ''} ${report.estado === 'solucionado' ? 'ok' : ''}">${report.estado.replace('_', ' ')}</span></header><p>${report.descripcion}</p><small class="socio-meta">${report.creado} · ${report.tipo === 'sugerencia' ? 'Enviada al administrador' : 'Enviada a mantenimiento'}</small><div class="chat-box"><div class="chat-messages" id="chat-${report.id}">Cargando conversación...</div><form class="chat-form" data-report-id="${report.id}" style="display:flex;gap:7px"><input name="mensaje" placeholder="Escribe un mensaje..." required><button class="socio-button" type="submit">Enviar</button></form></div></div>`).join('') : '<div class="empty">Aún no tienes conversaciones.</div>'; document.querySelectorAll('.chat-form').forEach((form) => form.addEventListener('submit', sendMessage)); data.reportes.forEach(loadMessages); };
+        const loadMessages = async (report) => { try { const data = await api(`/socio/reportes/${report.id}/mensajes`); const box = $('chat-' + report.id); box.innerHTML = data.mensajes.map((message) => `<div class="chat-message"><strong>${message.nombre}:</strong> ${message.mensaje}</div>`).join(''); box.scrollTop = box.scrollHeight; } catch (error) {} };
+        const sendMessage = async (event) => { event.preventDefault(); const form = event.currentTarget; const input = form.querySelector('input'); try { await api(`/socio/reportes/${form.dataset.reportId}/mensajes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mensaje: input.value }) }); input.value = ''; loadReports(); toast('Mensaje enviado'); } catch (error) { toast(error.message); } };
+        const updateConversationForm = () => { const suggestion = $('reporte-tipo').value === 'sugerencia'; $('foto-field').style.display = suggestion ? 'none' : 'grid'; $('reporte-submit').textContent = suggestion ? 'Enviar sugerencia al admin' : 'Enviar reporte a mantenimiento'; };
+        $('reporte-tipo').addEventListener('change', updateConversationForm); updateConversationForm();
+        $('reporte-form').addEventListener('submit', async (event) => { event.preventDefault(); const type = $('reporte-tipo').value; const body = new FormData(); body.append('tipo', type); body.append('etiqueta', $('reporte-etiqueta').value); body.append('descripcion', $('reporte-descripcion').value); if (type === 'mantenimiento' && $('reporte-foto').files[0]) body.append('foto', $('reporte-foto').files[0]); try { await api('/socio/reportes', { method: 'POST', body }); event.target.reset(); updateConversationForm(); loadReports(); toast(type === 'sugerencia' ? 'Sugerencia enviada al administrador' : 'Reporte creado para mantenimiento'); } catch (error) { toast(error.message); } });
+        $('serie-form').addEventListener('submit', async (event) => { event.preventDefault(); const descanso = Number($('serie-descanso').value); try { await api('/socio/series', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ejercicio_id: $('serie-ejercicio').value, peso: $('serie-peso').value, repeticiones: $('serie-reps').value, descanso_segundos: descanso, sensacion: $('serie-sensacion').value }) }); loadPerformance(); startTimer(descanso); toast('Serie guardada'); } catch (error) { toast(error.message); } });
+        const startTimer = (seconds) => { clearInterval(state.timer); $('timer').hidden = false; let left = seconds; const tick = () => { $('timer-value').textContent = `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`; if (left <= 0) { clearInterval(state.timer); navigator.vibrate?.([200, 100, 200]); toast('Descanso terminado'); } left -= 1; }; tick(); state.timer = setInterval(tick, 1000); };
+        const cleanTimerInput = (input, maximum) => {
+            input.value = input.value.replace(/[^0-9]/g, '').slice(0, 2);
+            const value = Math.min(maximum, Number.parseInt(input.value || '0', 10));
+            input.value = String(value);
+            return value;
+        };
+        const workoutTime = () => (cleanTimerInput($('workout-minutes'), 99) * 60) + cleanTimerInput($('workout-seconds'), 59);
+        const renderWorkoutTimer = () => { const left = Math.max(0, state.workoutRemaining); $('workout-timer-value').textContent = `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`; };
+        const stopWorkoutTimer = (finished = false) => { clearInterval(state.workoutTimer); state.workoutTimer = null; state.workoutRunning = false; $('workout-timer-state').textContent = finished ? 'Terminado' : 'Pausado'; if (finished) { navigator.vibrate?.([250, 120, 250]); toast('Cronómetro terminado'); } };
+        const startWorkoutTimer = () => { if (!state.workoutRemaining) state.workoutRemaining = workoutTime(); if (state.workoutRemaining <= 0) return toast('Indica una duración mayor a cero'); clearInterval(state.workoutTimer); state.workoutRunning = true; $('workout-timer-state').textContent = 'En marcha'; renderWorkoutTimer(); state.workoutTimer = setInterval(() => { state.workoutRemaining -= 1; renderWorkoutTimer(); if (state.workoutRemaining <= 0) stopWorkoutTimer(true); }, 1000); };
+        const resetWorkoutTimer = () => { clearInterval(state.workoutTimer); state.workoutRemaining = workoutTime(); state.workoutRunning = false; $('workout-timer-state').textContent = 'Listo'; renderWorkoutTimer(); };
+        $('stop-timer').addEventListener('click', () => { clearInterval(state.timer); $('timer').hidden = true; }); $('refresh-qr').addEventListener('click', makeQr);
+        $('workout-start').addEventListener('click', startWorkoutTimer); $('workout-pause').addEventListener('click', () => stopWorkoutTimer()); $('workout-reset').addEventListener('click', resetWorkoutTimer); $('workout-minutes').addEventListener('input', (event) => { cleanTimerInput(event.currentTarget, 99); resetWorkoutTimer(); }); $('workout-seconds').addEventListener('input', (event) => { cleanTimerInput(event.currentTarget, 59); resetWorkoutTimer(); });
+        $('cerrar-sesion').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST' }); window.location.replace('../../../../index.html'); });
+        (async () => { try { state.me = await api('/me'); if (state.me.usuario?.rol !== 'socio') throw new Error(); await loadDashboard(); } catch (error) { window.location.replace('../../formularios/login.html'); } })();
+    </script>
+</body>
+</html>
