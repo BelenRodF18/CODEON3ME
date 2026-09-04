@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Entrenador - Fit Power</title>
+    <link rel="stylesheet" href="../../../css/estilos.css">
+    <link rel="stylesheet" href="../../../css/mobile.css">
+    <link rel="stylesheet" href="../../../css/socio.css">
+</head>
+<body class="socio-app">
+    <div class="socio-shell">
+        <aside class="socio-sidebar"><div class="socio-brand"><img src="../../../assets/logos/logo.png" alt="Fit Power"><small>Panel del entrenador</small></div><nav class="socio-nav" aria-label="Secciones del entrenador"><button class="active" data-view="socios"><span>01</span> Mis socios</button><button data-view="rutinas"><span>02</span> Rutinas</button></nav><button class="socio-logout" id="cerrar-sesion">Cerrar sesión</button></aside>
+        <main class="socio-main"><header class="socio-topbar"><div><div class="socio-kicker">Seguimiento deportivo</div><h1>Panel del entrenador</h1></div><div class="socio-avatar">EN</div></header>
+            <section class="socio-view active" id="view-socios"><div class="socio-card full"><h2 style="color:#AAFA64">Mis socios</h2><div id="socios-entrenador">Cargando...</div></div></section>
+            <section class="socio-view" id="view-rutinas"><div class="socio-card full"><h2 style="color:#64FAB5">Nueva rutina</h2><form id="rutina-form" class="d-grid gap-2"><select name="socio_id" id="rutina-socio" class="form-select" required></select><input name="nombre" class="form-control" placeholder="Nombre de la rutina" required><textarea name="descripcion" class="form-control" placeholder="Objetivo o indicaciones"></textarea><div id="rutina-ejercicios"></div><button type="button" id="agregar-ejercicio" class="btn btn-outline-light">Agregar ejercicio</button><button class="btn btn-success">Crear y asignar rutina</button></form></div><div class="socio-card full mt-4"><h2 style="color:#64F5FA">Rutinas guardadas</h2><div id="rutinas-entrenador">Cargando...</div></div></section>
+        </main>
+    </div>
+    <script>
+        document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => { document.querySelectorAll('.socio-view').forEach((view) => view.classList.toggle('active', view.id === 'view-' + button.dataset.view)); document.querySelectorAll('.socio-nav button').forEach((item) => item.classList.toggle('active', item === button)); }));
+        (async () => {
+            const response = await fetch('/api/me'); const data = await response.json();
+            if (!response.ok || data.usuario?.rol !== 'entrenador') { window.location.replace('../../formularios/login.html'); return; }
+            document.getElementById('cerrar-sesion').addEventListener('click', async (event) => { event.preventDefault(); await fetch('/api/logout', { method: 'POST' }); window.location.replace('../../../../index.html'); });
+            const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[character]));
+            const agregarEjercicio = (ejercicios) => { const row = document.createElement('div'); row.className = 'd-flex gap-2 mt-2 rutina-row'; row.innerHTML = `<select class="form-select ejercicio-id">${ejercicios.map((exercise) => `<option value="${exercise.id}">${escapeHtml(exercise.nombre)} · ${escapeHtml(exercise.grupo)}</option>`).join('')}</select><input class="form-control ejercicio-series" type="number" min="1" value="3" aria-label="Series"><input class="form-control ejercicio-reps" value="10" aria-label="Repeticiones">`; document.getElementById('rutina-ejercicios').appendChild(row); };
+            const cargar = async () => { const result = await fetch('/api/entrenador/resumen'); const data = await result.json(); if (!result.ok) throw new Error(data.message); document.getElementById('socios-entrenador').innerHTML = data.socios.map((socio) => `<div class="border-bottom border-secondary py-2"><strong>${escapeHtml(socio.nombre)}</strong><small class="d-block">${escapeHtml(socio.email)} · ${escapeHtml(socio.membresia)}</small></div>`).join('') || '<p>No tienes socios asignados.</p>'; document.getElementById('rutina-socio').innerHTML = data.socios.map((socio) => `<option value="${socio.id}">${escapeHtml(socio.nombre)}</option>`).join(''); document.getElementById('rutinas-entrenador').innerHTML = data.rutinas.map((routine) => `<div class="border-bottom border-secondary py-2"><strong>${escapeHtml(routine.nombre)}</strong><small class="d-block">${escapeHtml(routine.socio)} · ${routine.fecha}</small><span>${escapeHtml(routine.descripcion || 'Sin descripción')}</span></div>`).join('') || '<p>Aún no hay rutinas guardadas.</p>'; document.getElementById('rutina-ejercicios').innerHTML = ''; agregarEjercicio(data.ejercicios); document.getElementById('agregar-ejercicio').onclick = () => agregarEjercicio(data.ejercicios); };
+            document.getElementById('rutina-form').addEventListener('submit', async (event) => { event.preventDefault(); const values = Object.fromEntries(new FormData(event.currentTarget)); values.ejercicios = [...document.querySelectorAll('.rutina-row')].map((row) => ({ id: row.querySelector('.ejercicio-id').value, series: row.querySelector('.ejercicio-series').value, repeticiones: row.querySelector('.ejercicio-reps').value })); const result = await fetch('/api/entrenador/rutinas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(values) }); const data = await result.json(); alert(data.message); if (result.ok) { event.currentTarget.reset(); await cargar(); } });
+            cargar().catch((error) => { document.getElementById('socios-entrenador').textContent = error.message; });
+        })().catch(() => window.location.replace('../../formularios/login.html'));
+    </script>
+</body>
+</html>
