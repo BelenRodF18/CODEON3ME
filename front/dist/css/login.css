@@ -1,0 +1,125 @@
+.body-auth {
+    background-color: #111111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.contenedor-auth {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
+
+.caja-auth {
+    background: #161616;
+    border: 2px solid #46ECF4; 
+    border-radius: 24px;
+    padding: 30px 30px 40px 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.btn-volver {
+    display: inline-block;
+    color: #aaaaaa;    
+    font-size: 15px;  
+    font-weight: 500; 
+    text-decoration: none;
+    margin-bottom: 25px; 
+    transition: color 0.2s ease;
+    text-align: left;
+    width: 100%; 
+}
+
+.btn-volver:hover {
+    color: #46ECF4;  
+}
+
+.auth-logo img {
+    height: 120px;
+    margin-bottom: 5px;
+}
+
+.caja-auth h2 {
+    color: #ffffff;
+    font-size: 22px;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.formulario-auth {
+    text-align: left;
+}
+
+.grupo-input {
+    margin-bottom: 18px;
+}
+
+.grupo-input label {
+    display: block;
+    color: #aaaaaa;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.grupo-input input, 
+.grupo-input select {
+    width: 100%;
+    background-color: #252525 !important;
+    border: 1px solid #333333 !important;
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #ffffff !important;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.grupo-input input:focus, 
+.grupo-input select:focus {
+    outline: none;
+    border-color: #5DF64A !important; 
+    box-shadow: 0 0 8px rgba(93, 246, 74, 0.2);
+}
+
+.grupo-input select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 16px center !important;
+    background-size: 16px !important;
+    cursor: pointer;
+}
+
+.btn-degradado-auth {
+    width: 100%;
+    background: linear-gradient(135deg, #46ECF4, #5DF64A);
+    border: none;
+    color: #000000;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    text-decoration: none;
+    display: block;        
+    text-align: center;    
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-degradado-auth:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(93, 246, 74, 0.3);
+}
+
+.auth-cambio {
+    color: #888888;
+    font-size: 14px;
+    margin-top: 25px;
+}
