@@ -59,7 +59,16 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
 .chat-box { margin-top: 12px; border-top: 1px solid #2d3931; padding-top: 12px; }
 .chat-messages { max-height: 150px; overflow: auto; display: grid; gap: 7px; margin-bottom: 9px; }
 .chat-message { color: #d8e0d7; background: #1a231d; padding: 8px 10px; border-radius: 8px; font-size: 12px; }
-.chart-row { display: grid; grid-template-columns: 1.2fr .6fr .6fr .8fr; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid #29342d; font-size: 13px; }
+.fila-control { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin-top: 12px; }
+.fila-control select, .fila-control input { border: 1px solid #344138; border-radius: 8px; background: #0b0f0c; color: #f3f6f1; padding: 10px 12px; font: inherit; }
+.fila-control input { flex: 1; min-width: 180px; } .fila-control select:focus, .fila-control input:focus { outline: 2px solid #83b956; outline-offset: 1px; }
+.socio-nav button { position: relative; }
+.nav-badge { position: absolute; left: 26px; top: 4px; display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px; background: var(--lime); color: #0b1a0d; font-size: 10px; box-shadow: 0 0 0 2px #111612; }
+.nav-badge[hidden], .aviso-card[hidden] { display: none; } .aviso-card { border-color: #46603a; }
+.records-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 12px; }
+.record-item { display: grid; gap: 3px; border: 1px solid #2d3931; border-radius: 10px; padding: 12px 14px; } .record-item strong { color: var(--lime); font: 700 24px 'Space Grotesk', sans-serif; } .record-item small { color: var(--muted); }
+.rutina-row { display: grid; grid-template-columns: 1fr 100px 160px; gap: 10px; margin-bottom: 10px; } .rutina-row label { display: grid; gap: 6px; }
+.chart-row { display: grid; grid-template-columns: 1.2fr .6fr .6fr .8fr auto; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid #29342d; font-size: 13px; }
 .chart-row strong { color: var(--mint); } .empty { color: var(--muted); padding: 20px 0; }
 .timer { text-align: center; border: 1px solid #46603a; background: #182319; border-radius: 12px; padding: 18px; margin-top: 17px; }
 .timer strong { display: block; color: var(--lime); font: 700 43px 'Space Grotesk', sans-serif; }
@@ -78,4 +87,5 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
     .socio-main { padding: 24px 15px 45px; } .socio-topbar { margin-bottom: 25px; } .socio-avatar { display: none; }
     .socio-card, .socio-card.wide { grid-column: 1 / -1; } .form-grid, .qr-layout { grid-template-columns: 1fr; } .qr-box { margin: 0 auto; }
     .chart-row { grid-template-columns: 1fr 1fr; gap: 7px; } .chart-row span:first-child { grid-column: 1 / -1; }
+    .rutina-row { grid-template-columns: 1fr 1fr; } .nav-badge { position: static; transform: none; margin-left: 6px; } .rutina-row label:first-child { grid-column: 1 / -1; }
 }

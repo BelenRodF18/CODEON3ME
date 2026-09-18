@@ -3,17 +3,18 @@ namespace App\Controllers;
 
 use App\Models\Auth\AuthModel;
 
+/** Inicio y cierre de sesión, y consulta del usuario conectado. */
 class AuthController {
     private $db;
 
+    /** Guarda la conexión y abre la sesión. */
     public function __construct($db) {
         $this->db = $db;
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        \App\Utils\Sesion::iniciar();
     }
 
+    /** POST /login: valida usuario y contraseña, regenera la sesión y devuelve el rol. */
     public function login() {
         header('Content-Type: application/json; charset=UTF-8');
 
@@ -25,17 +26,17 @@ class AuthController {
             return;
         }
 
-        $email = trim((string)($input['email'] ?? ''));
+        $nombreUsuario = strtolower(trim((string)($input['usuario'] ?? '')));
         $password = (string)($input['password'] ?? '');
 
-        if ($email === '' || $password === '') {
+        if ($nombreUsuario === '' || $password === '') {
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Email y contraseña son requeridos']);
+            echo json_encode(['status' => 'error', 'message' => 'Usuario y contraseña son requeridos']);
             return;
         }
 
         $model = new AuthModel($this->db);
-        $usuario = $model->buscarPorEmail($email);
+        $usuario = $model->buscarPorUsuario($nombreUsuario);
 
         if (!$usuario) {
             http_response_code(401);
@@ -56,11 +57,11 @@ class AuthController {
         }
 
         session_regenerate_id(true);
-        $roles = ['Administrador' => 'admin', 'Entrenador' => 'entrenador', 'Socio' => 'socio', 'Personal' => 'personal'];
+        $roles = ['Administrador' => 'admin', 'Entrenador' => 'entrenador', 'Socio' => 'socio', 'Personal' => 'personal', 'Recepcion' => 'recepcion'];
         $rol = $roles[$usuario['rol']] ?? strtolower($usuario['rol']);
         $_SESSION['usuario_id'] = (int)$usuario['id'];
         $_SESSION['usuario_nombre'] = $usuario['nombre'];
-        $_SESSION['usuario_email'] = $usuario['email'];
+        $_SESSION['usuario_login'] = $usuario['nombre_usuario'];
         $_SESSION['usuario_rol'] = $rol;
 
         echo json_encode([
@@ -69,12 +70,13 @@ class AuthController {
             'usuario' => [
                 'id' => (int)$usuario['id'],
                 'nombre' => $usuario['nombre'],
-                'email' => $usuario['email'],
+                'nombre_usuario' => $usuario['nombre_usuario'],
                 'rol' => $rol
             ]
         ]);
     }
 
+    /** POST /logout: borra la sesión y su cookie. */
     public function logout() {
         $_SESSION = [];
 
@@ -91,6 +93,7 @@ class AuthController {
         ]);
     }
 
+    /** GET /me: devuelve el usuario conectado o 401 si no hay sesión. */
     public function me() {
         if (empty($_SESSION['usuario_id'])) {
             http_response_code(401);
@@ -103,9 +106,22 @@ class AuthController {
             'usuario' => [
                 'id' => $_SESSION['usuario_id'],
                 'nombre' => $_SESSION['usuario_nombre'],
-                'email' => $_SESSION['usuario_email'],
+                'nombre_usuario' => $_SESSION['usuario_login'] ?? '',
                 'rol' => $_SESSION['usuario_rol']
             ]
         ]);
+    }
+
+    /** GET /sesion: usuario conectado o null (siempre 200; lo usa la web pública). */
+    public function sesion() {
+        echo json_encode([
+            'status' => 'success',
+            'usuario' => empty($_SESSION['usuario_id']) ? null : [
+                'id' => $_SESSION['usuario_id'],
+                'nombre' => $_SESSION['usuario_nombre'],
+                'nombre_usuario' => $_SESSION['usuario_login'] ?? '',
+                'rol' => $_SESSION['usuario_rol'],
+            ],
+        ], JSON_UNESCAPED_UNICODE);
     }
 }

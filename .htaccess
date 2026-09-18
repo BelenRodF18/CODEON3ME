@@ -20,3 +20,14 @@
     # Redirige físicamente a la carpeta front cuando entran a la raíz
     RewriteRule ^$ /front/index.html [R=301,L]
 </IfModule>
+
+# ====================================================
+# 3. CACHÉ DEL NAVEGADOR
+# ====================================================
+# HTML, JS y CSS se revalidan en cada visita (responde 304 si no cambiaron),
+# así una página nueva nunca queda mezclada con un script viejo.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|js|css)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>

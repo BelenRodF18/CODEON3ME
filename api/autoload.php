@@ -1,5 +1,8 @@
 <?php
-// api/autoload.php
+/**
+ * Carga automática de clases: App\Controllers\AuthController => src/Controllers/AuthController.php.
+ */
+
 spl_autoload_register(function ($class) {
     $prefix = 'App\\';
     $base_dir = __DIR__ . '/src/';

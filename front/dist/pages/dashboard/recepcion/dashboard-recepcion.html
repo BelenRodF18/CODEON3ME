@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recepción | Fit Power</title>
+    <link rel="icon" type="image/png" href="../../../assets/logos/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/ui.css?v=20260918">
+    <link rel="stylesheet" href="../../../css/recepcion.css?v=20260918">
+</head>
+<body class="rec-app">
+    <div class="rec-shell">
+        <header class="rec-topbar">
+            <div class="rec-marca">
+                <img src="../../../assets/logos/logo.png" alt="Fit Power">
+                <span>
+                    <span class="rec-titulo">FITPOWER</span>
+                    <span class="rec-sub">Recepción</span>
+                </span>
+            </div>
+            <div class="rec-operador">
+                <strong id="operador">—</strong>
+                <button class="fp-btn fp-btn--ghost fp-btn--sm" id="cerrar-sesion" type="button" style="margin-top:8px">Cerrar sesión</button>
+            </div>
+        </header>
+
+        <div class="rec-grid">
+            <!-- ================================================= Lector de QR -->
+            <section class="rec-card">
+                <h2>Escanear código QR</h2>
+                <p>Pedile al socio que muestre su QR y apuntá la cámara al código.</p>
+
+                <div class="rec-escaner">
+                    <div class="rec-visor" id="visor">
+                        <div class="rec-placeholder" id="escaner-placeholder">
+                            <div class="rec-placeholder-icono" aria-hidden="true">▣</div>
+                            <p>El lector está apagado. Tocá <strong>Escanear QR</strong> para encender la cámara.</p>
+                        </div>
+                        <div id="lector" hidden style="width:100%;height:100%"></div>
+                    </div>
+
+                    <div class="rec-acciones">
+                        <button class="fp-btn" id="btn-escanear" type="button">Escanear QR</button>
+                        <button class="fp-btn fp-btn--ghost" id="btn-detener" type="button" hidden>Detener lector</button>
+                    </div>
+
+                    <p class="rec-estado" id="escaner-estado" data-tono="neutro" role="status" aria-live="polite">Esperando código...</p>
+                </div>
+
+                <div class="rec-resultado" id="resultado" hidden aria-live="assertive"></div>
+
+                <form class="rec-manual" id="form-manual" autocomplete="off">
+                    <label class="fp-sr" for="token-manual">Token del QR</label>
+                    <input id="token-manual" name="token" placeholder="Ingreso manual: pegá el token del QR" maxlength="200">
+                    <button class="fp-btn fp-btn--suave" type="submit">Validar</button>
+                </form>
+            </section>
+
+            <!-- ==================================================== Historial -->
+            <section class="rec-card">
+                <div class="fp-toolbar">
+                    <div>
+                        <h2>Ingresos y salidas</h2>
+                        <p style="margin:0">El primer escaneo registra el ingreso; el siguiente, la salida.</p>
+                    </div>
+                    <button class="fp-btn fp-btn--ghost fp-btn--sm" id="btn-actualizar" type="button">Actualizar</button>
+                </div>
+
+                <dl class="rec-stats">
+                    <div class="fp-stat fp-stat--acento"><dt>Aceptados</dt><dd id="kpi-permitidos">—</dd></div>
+                    <div class="fp-stat"><dt>Rechazados</dt><dd id="kpi-denegados">—</dd></div>
+                    <div class="fp-stat"><dt>Adentro ahora</dt><dd id="kpi-adentro">—</dd></div>
+                </dl>
+
+                <div id="historial"></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="../../../js/ui.js?v=20260918"></script>
+    <script src="../../../js/recepcion.js?v=20260918"></script>
+</body>
+</html>

@@ -1,6 +1,189 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Dashboard Entrenador - Fit Power</title><link rel="stylesheet" href="../../../css/socio.css"></head>
-<body class="socio-app"><div class="socio-shell"><aside class="socio-sidebar"><div class="socio-brand"><img src="../../../assets/logos/logo.png" alt="Fit Power"><small>Panel del entrenador</small></div><nav class="socio-nav"><button class="active" data-view="socios"><span>01</span> Mis socios</button><button data-view="rutinas"><span>02</span> Rutinas</button></nav><button class="socio-logout" id="logout">Cerrar sesión</button></aside><main class="socio-main"><header class="socio-topbar"><div><div class="socio-kicker">Seguimiento deportivo</div><h1>Panel del entrenador</h1></div><div class="socio-avatar">EN</div></header><section class="socio-view active" id="view-socios"><div class="socio-card full"><h2>Mis socios asignados</h2><div id="socios-entrenador" class="routine-list">Cargando...</div></div></section><section class="socio-view" id="view-rutinas"><div class="socio-card full"><h2>Crear rutina</h2><form id="rutina-form" class="form-grid"><div class="field full"><label>Socio<select id="rutina-socio" name="socio_id" required></select></label></div><div class="field"><label>Nombre<input name="nombre" required placeholder="Ej. Fuerza tren superior"></label></div><div class="field"><label>Descripción<input name="descripcion" placeholder="Objetivo de la rutina"></label></div><div id="rutina-ejercicios" class="field full"></div><button type="button" id="agregar-ejercicio" class="socio-button secondary">Agregar ejercicio</button><button class="socio-button" type="submit">Crear y asignar rutina</button></form></div><div class="socio-card full" style="margin-top:18px"><h2>Rutinas guardadas</h2><div id="rutinas-entrenador" class="routine-list">Cargando...</div></div></section></main></div><script>
-const api=async(path,options={})=>{const response=await fetch('/api'+path,options);const data=await response.json();if(!response.ok)throw Error(data.message||'No se pudo completar la operación');return data};const escapeHtml=(value)=>String(value).replace(/[&<>'"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c]));const show=(name)=>{document.querySelectorAll('.socio-view').forEach((view)=>view.classList.toggle('active',view.id==='view-'+name));document.querySelectorAll('.socio-nav button').forEach((button)=>button.classList.toggle('active',button.dataset.view===name))};document.querySelectorAll('[data-view]').forEach((button)=>button.onclick=()=>show(button.dataset.view));const addExercise=(exercises)=>{const row=document.createElement('div');row.className='d-flex gap-2 mt-2 rutina-row';row.innerHTML=`<select class="form-select exercise-id">${exercises.map((exercise)=>`<option value="${exercise.id}">${escapeHtml(exercise.nombre)} · ${escapeHtml(exercise.grupo)}</option>`).join('')}</select><input class="form-control exercise-series" type="number" min="1" value="3" aria-label="Series"><input class="form-control exercise-reps" value="10" aria-label="Repeticiones">`;document.getElementById('rutina-ejercicios').appendChild(row)};const load=async()=>{const data=await api('/entrenador/resumen');document.getElementById('socios-entrenador').innerHTML=data.socios.map((socio)=>`<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(socio.nombre)}</strong><small>${escapeHtml(socio.membresia)}</small></div><p class="socio-meta">${escapeHtml(socio.email)}</p></div>`).join('')||'<div class="empty">No hay socios asignados.</div>';document.getElementById('rutina-socio').innerHTML=data.socios.map((socio)=>`<option value="${socio.id}">${escapeHtml(socio.nombre)}</option>`).join('');document.getElementById('rutinas-entrenador').innerHTML=data.rutinas.map((routine)=>`<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(routine.nombre)}</strong><small>${escapeHtml(routine.socio)}</small></div><p class="socio-meta">${escapeHtml(routine.descripcion||'Sin descripción')} · ${routine.fecha}</p></div>`).join('')||'<div class="empty">Aún no hay rutinas guardadas.</div>';document.getElementById('rutina-ejercicios').innerHTML='';addExercise(data.ejercicios);document.getElementById('agregar-ejercicio').onclick=()=>addExercise(data.ejercicios)};document.getElementById('rutina-form').onsubmit=async(event)=>{event.preventDefault();const values=Object.fromEntries(new FormData(event.currentTarget));values.ejercicios=[...document.querySelectorAll('.rutina-row')].map((row)=>({id:row.querySelector('.exercise-id').value,series:row.querySelector('.exercise-series').value,repeticiones:row.querySelector('.exercise-reps').value}));const result=await api('/entrenador/rutinas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(values)});alert(result.message);if(result.status==='success'){event.currentTarget.reset();load()}};document.getElementById('logout').onclick=async(event)=>{event.preventDefault();await api('/logout',{method:'POST'});location.replace('../../../../index.html')};(async()=>{const me=await api('/me');if(me.usuario?.rol!=='entrenador')return location.replace('../../formularios/login.html');load()})().catch(()=>location.replace('../../formularios/login.html'));
-</script></body></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Entrenador - Fit Power</title>
+    <link rel="icon" type="image/png" href="../../../assets/logos/logo.png">
+    <link rel="stylesheet" href="../../../css/socio.css?v=20260918">
+    <link rel="stylesheet" href="../../../css/ui.css?v=20260918">
+</head>
+<body class="socio-app">
+    <div class="socio-shell">
+        <aside class="socio-sidebar">
+            <div class="socio-brand">
+                <img src="../../../assets/logos/logo.png" alt="Fit Power">
+                <small>Panel del entrenador</small>
+            </div>
+            <nav class="socio-nav">
+                <button class="active" data-view="socios"><span>01</span> Mis socios</button>
+                <button data-view="rutinas"><span>02</span> Rutinas</button>
+            </nav>
+            <button class="socio-logout" id="logout">Cerrar sesión</button>
+        </aside>
+        <main class="socio-main">
+            <header class="socio-topbar">
+                <div>
+                    <div class="socio-kicker">Seguimiento deportivo</div>
+                    <h1>Panel del entrenador</h1>
+                </div>
+                <div class="socio-avatar">EN</div>
+            </header>
+            <section class="socio-view active" id="view-socios">
+                <div class="socio-card full">
+                    <h2>Programas a mi cargo</h2>
+                    <div id="programas-entrenador" class="routine-list">Cargando...</div>
+                </div>
+                <div class="socio-card full" style="margin-top:18px">
+                    <h2>Mis socios</h2>
+                    <p class="socio-meta">Los que te tienen como entrenador personal y los inscriptos en tus programas.</p>
+                    <div id="socios-entrenador" class="routine-list">Cargando...</div>
+                </div>
+            </section>
+            <section class="socio-view" id="view-rutinas">
+                <div class="socio-card full">
+                    <h2>Crear rutina</h2>
+                    <form id="rutina-form" class="form-grid">
+                        <div class="field full">
+                            <label>Socio<select id="rutina-socio" name="socio_id" required></select></label>
+                        </div>
+                        <div class="field full">
+                            <label>Programa<select id="rutina-programa" name="programa_id"></select></label>
+                        </div>
+                        <div class="field">
+                            <label>Nombre<input name="nombre" required placeholder="Ej. Fuerza tren superior"></label>
+                        </div>
+                        <div class="field">
+                            <label>Descripción<input name="descripcion" placeholder="Objetivo de la rutina"></label>
+                        </div>
+                        <div id="rutina-ejercicios" class="field full"></div>
+                        <button type="button" id="agregar-ejercicio" class="socio-button secondary">Agregar ejercicio</button>
+                        <button class="socio-button" type="submit">Crear y asignar rutina</button>
+                    </form>
+                </div>
+                <div class="socio-card full" style="margin-top:18px">
+                    <h2>Rutinas guardadas</h2>
+                    <div id="rutinas-entrenador" class="routine-list">Cargando...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="../../../js/ui.js?v=20260918"></script>
+    <script>
+        // Misma llamada a la API que el resto de los paneles: si la sesión
+        // vence o cambia de cuenta, vuelve al login con el motivo.
+        const api = window.FP.api;
+
+        // Escapa el texto antes de insertarlo en el HTML.
+        const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (c) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+        }[c]));
+
+        // Cambia de sección del panel.
+        const show = (name) => {
+            document.querySelectorAll('.socio-view').forEach((view) => view.classList.toggle('active', view.id === 'view-' + name));
+            document.querySelectorAll('.socio-nav button').forEach((button) => button.classList.toggle('active', button.dataset.view === name));
+        };
+        document.querySelectorAll('[data-view]').forEach((button) => button.onclick = () => show(button.dataset.view));
+
+        // Agrega una fila de ejercicio al formulario de rutina.
+        const addExercise = (exercises) => {
+            const row = document.createElement('div');
+            row.className = 'rutina-row';
+            row.innerHTML = `<label>Ejercicio<select class="exercise-id">${exercises.map((exercise) =>
+                `<option value="${exercise.id}">${escapeHtml(exercise.nombre)} · ${escapeHtml(exercise.grupo)}</option>`
+            ).join('')}</select></label><label>Series<input class="exercise-series" type="number" min="1" value="3"></label><label>Repeticiones<input class="exercise-reps" value="10"></label>`;
+            document.getElementById('rutina-ejercicios').appendChild(row);
+        };
+
+        let resumen = { socios: [], programas: [] };
+
+        // Texto del vínculo con el socio: personal y/o programas.
+        const vinculo = (socio) => [socio.personal ? 'Entrenamiento personal' : null, socio.programas]
+            .filter(Boolean).join(' · ');
+
+        // Solo se ofrecen los programas tuyos en los que el socio está inscripto,
+        // más el entrenamiento personal si sos su entrenador personal.
+        const updateProgramOptions = () => {
+            const socio = resumen.socios.find((item) => String(item.id) === document.getElementById('rutina-socio').value);
+            const opciones = socio
+                ? (socio.personal ? ['<option value="">Entrenamiento personal</option>'] : []).concat(
+                    resumen.programas
+                        .filter((programa) => socio.programa_ids.includes(programa.id))
+                        .map((programa) => `<option value="${programa.id}">${escapeHtml(programa.nombre)}</option>`))
+                : [];
+            document.getElementById('rutina-programa').innerHTML = opciones.join('');
+        };
+
+        // Carga programas, socios, ejercicios y rutinas del entrenador.
+        const load = async () => {
+            const data = await api('/entrenador/resumen');
+            resumen = data;
+
+            document.getElementById('programas-entrenador').innerHTML = data.programas.map((programa) =>
+                `<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(programa.nombre)}</strong><small>${programa.inscriptos} ${programa.inscriptos === 1 ? 'inscripto' : 'inscriptos'}</small></div></div>`
+            ).join('') || '<div class="empty">No tenés programas a cargo.</div>';
+
+            document.getElementById('socios-entrenador').innerHTML = data.socios.map((socio) =>
+                `<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(socio.nombre)}</strong><small>${escapeHtml(socio.membresia)}</small></div><p class="socio-meta">${escapeHtml(socio.nombre_usuario)} · ${escapeHtml(vinculo(socio))}</p></div>`
+            ).join('') || '<div class="empty">No hay socios asignados.</div>';
+
+            // Se conserva el socio elegido: armar varias rutinas seguidas para
+            // el mismo socio no obliga a volver a buscarlo.
+            const selectorSocio = document.getElementById('rutina-socio');
+            const socioElegido = selectorSocio.value;
+            selectorSocio.innerHTML = data.socios.map((socio) =>
+                `<option value="${socio.id}">${escapeHtml(socio.nombre)}</option>`
+            ).join('');
+            if (data.socios.some((socio) => String(socio.id) === socioElegido)) selectorSocio.value = socioElegido;
+            updateProgramOptions();
+
+            document.getElementById('rutinas-entrenador').innerHTML = data.rutinas.map((routine) =>
+                `<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(routine.nombre)}</strong><small>${escapeHtml(routine.socio)}</small></div><p class="socio-meta">${escapeHtml(routine.programa || 'Entrenamiento personal')} · ${escapeHtml(routine.descripcion || 'Sin descripción')} · ${routine.fecha}</p></div>`
+            ).join('') || '<div class="empty">Aún no hay rutinas guardadas.</div>';
+
+            document.getElementById('rutina-ejercicios').innerHTML = '';
+            addExercise(data.ejercicios);
+            document.getElementById('agregar-ejercicio').onclick = () => addExercise(data.ejercicios);
+        };
+
+        document.getElementById('rutina-socio').onchange = updateProgramOptions;
+
+        document.getElementById('rutina-form').onsubmit = async (event) => {
+            event.preventDefault();
+            const form = event.currentTarget;
+
+            const values = Object.fromEntries(new FormData(form));
+            values.ejercicios = [...document.querySelectorAll('.rutina-row')].map((row) => ({
+                id: row.querySelector('.exercise-id').value,
+                series: row.querySelector('.exercise-series').value,
+                repeticiones: row.querySelector('.exercise-reps').value
+            }));
+
+            try {
+                const result = await api('/entrenador/rutinas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(values)
+                });
+                window.FP.exito('Rutina creada', result.message);
+                form.querySelector('[name=nombre]').value = '';
+                form.querySelector('[name=descripcion]').value = '';
+                await load();
+            } catch (error) {
+                window.FP.error('No se pudo crear la rutina', error.message);
+            }
+        };
+
+        document.getElementById('logout').onclick = (event) => {
+            event.preventDefault();
+            window.FP.cerrarSesion();
+        };
+
+        (async () => {
+            await window.FP.exigirSesion('entrenador');
+            await load();
+        })().catch(() => {});
+    </script>
+</body>
+</html>
