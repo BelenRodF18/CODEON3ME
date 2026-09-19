@@ -1,21 +1,21 @@
 <?php
-// api/index.php
+/**
+ * Punto de entrada de la API (Front Controller).
+ * Carga el .env, abre la conexión a MySQL y deja que el router atienda la petición.
+ * Toda respuesta sale en JSON.
+ */
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// ... el resto de tu código (require autoload, router, etc.)
-// 1. Iniciamos buffer para atrapar cualquier error de texto plano o warnings de PHP
 ob_start(); 
 
-// 2. Cabeceras estrictas para API-Driven
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
-// Manejo de peticiones preflight (CORS) de los navegadores
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -23,12 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once 'autoload.php';
 
-// 3. Cargar las variables del archivo .env
 \App\Utils\EnvLoader::load(__DIR__ . '/.env');
 
 require_once 'config/database.php';
 
-// 4. Intentar conexión aislada
 try {
     $db = (new Database())->getConnection();
 } catch (Throwable $e) {
@@ -48,17 +46,12 @@ try {
     exit;
 }
 
-// En Docker Apache la API vive en http://localhost:8080/api
 $base = '/api';
 
-// Instanciamos el router inyectando el base path correcto y la DB
 $router = new \App\Utils\Router($base, $db);
 
-// Cargamos todas las definiciones de rutas
 require_once 'routes.php';
 
-// 5. Limpiamos cualquier echo/espacio en blanco accidental antes de ejecutar
 $basura = ob_get_clean(); 
 
-// 6. Lanzar la aplicación
 $router->run();

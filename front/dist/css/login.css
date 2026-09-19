@@ -1,3 +1,9 @@
+/* ==========================================================================
+   FitPower · Inicio de sesión
+   Estilos de la página login.html.
+   ========================================================================== */
+
+/* -------------------------------------------------------- Fondo de la página */
 .body-auth {
     background-color: #111111;
     display: flex;
@@ -8,6 +14,7 @@
     font-family: 'Space Grotesk', sans-serif;
 }
 
+/* ------------------------------------------------------- Caja del formulario */
 .contenedor-auth {
     width: 100%;
     max-width: 420px;
@@ -23,6 +30,7 @@
     text-align: center;
 }
 
+/* ------------------------------------------------- Enlace "Volver al inicio" */
 .btn-volver {
     display: inline-block;
     color: #aaaaaa;    
@@ -39,6 +47,7 @@
     color: #46ECF4;  
 }
 
+/* ------------------------------------------------------------- Logo y título */
 .auth-logo img {
     height: 120px;
     margin-bottom: 5px;
@@ -51,6 +60,7 @@
     font-weight: 600;
 }
 
+/* ----------------------------------------------------- Campos del formulario */
 .formulario-auth {
     text-align: left;
 }
@@ -95,6 +105,7 @@
     cursor: pointer;
 }
 
+/* ---------------------------------------------------- Botón "Iniciar Sesión" */
 .btn-degradado-auth {
     width: 100%;
     background: linear-gradient(135deg, #46ECF4, #5DF64A);
@@ -118,6 +129,7 @@
     box-shadow: 0 5px 15px rgba(93, 246, 74, 0.3);
 }
 
+/* -------------------------------------------------- Enlace para pedir acceso */
 .auth-cambio {
     color: #888888;
     font-size: 14px;

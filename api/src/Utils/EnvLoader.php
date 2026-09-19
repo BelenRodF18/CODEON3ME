@@ -1,7 +1,9 @@
 <?php
 namespace App\Utils;
 
+/** Lee el archivo .env y carga sus variables en el entorno de PHP. */
 class EnvLoader {
+    /** Carga cada CLAVE=valor del archivo sin pisar variables que ya existan. */
     public static function load($path) {
         if (!file_exists($path)) return;
 
@@ -20,8 +22,6 @@ class EnvLoader {
             $name = preg_replace('/^\xEF\xBB\xBF/', '', $name);
             if ($name === '') continue;
 
-            // Si el proceso ya tiene un valor no vacío (Docker, Apache SetEnv, etc.), no pisarlo.
-            // Si existe pero está vacío, sí cargar desde .env — sin eso B2_* suele fallar aunque el .env esté bien.
             $current = '';
             if (array_key_exists($name, $_ENV)) {
                 $current = (string) $_ENV[$name];

@@ -1,3 +1,9 @@
+/* ==========================================================================
+   FitPower · Web pública en celulares y tablets
+   Menú hamburguesa y ajustes de cada sección por debajo de 992 px.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- Menú */
 .menu-hamburguesa {
     display: none;
 }
