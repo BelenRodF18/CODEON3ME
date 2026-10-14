@@ -1,9 +1,4 @@
-/* Panel del entrenador: sus programas y socios, y la creación de rutinas.
-   Usa la API /entrenador/... a través de window.FP.api (ui.js). */
-
-// Misma llamada a la API que el resto de los paneles: si la sesión
-// vence o cambia de cuenta, vuelve al login con el motivo.
-const api = window.FP.api;
+/* Panel del entrenador: sus programas y socios, y la creación de rutinas. */
 
 // Escapa el texto antes de insertarlo en el HTML.
 const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (c) => ({
@@ -34,8 +29,7 @@ let resumen = { socios: [], programas: [] };
 const vinculo = (socio) => [socio.personal ? 'Entrenamiento personal' : null, socio.programas]
     .filter(Boolean).join(' · ');
 
-// Solo se ofrecen los programas tuyos en los que el socio está inscripto,
-// más el entrenamiento personal si sos su entrenador personal.
+// Programas disponibles para el socio elegido.
 const updateProgramOptions = () => {
     const socio = resumen.socios.find((item) => String(item.id) === document.getElementById('rutina-socio').value);
     const opciones = socio
@@ -49,7 +43,8 @@ const updateProgramOptions = () => {
 
 // Carga programas, socios, ejercicios y rutinas del entrenador.
 const load = async () => {
-    const data = await api('/entrenador/resumen');
+    const data = await API.request('/entrenador/resumen');
+    if (data.status === 'error') throw new Error(data.message);
     resumen = data;
 
     document.getElementById('programas-entrenador').innerHTML = data.programas.map((programa) =>
@@ -60,8 +55,6 @@ const load = async () => {
         `<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(socio.nombre)}</strong><small>${escapeHtml(socio.membresia)}</small></div><p class="socio-meta">${escapeHtml(socio.nombre_usuario)} · ${escapeHtml(vinculo(socio))}</p></div>`
     ).join('') || '<div class="empty">No hay socios asignados.</div>';
 
-    // Se conserva el socio elegido: armar varias rutinas seguidas para
-    // el mismo socio no obliga a volver a buscarlo.
     const selectorSocio = document.getElementById('rutina-socio');
     const socioElegido = selectorSocio.value;
     selectorSocio.innerHTML = data.socios.map((socio) =>
@@ -96,24 +89,30 @@ document.getElementById('rutina-form').onsubmit = async (event) => {
     }));
 
     try {
-        const result = await api('/entrenador/rutinas', 'POST', values);
-        window.FP.exito('Rutina creada', result.message);
+        const result = await API.request('/entrenador/rutinas', 'POST', values);
+        if (result.status === 'error') throw new Error(result.message);
+        avisoExito('Rutina creada', result.message);
         form.querySelector('[name=nombre]').value = '';
         form.querySelector('[name=descripcion]').value = '';
         await load();
     } catch (error) {
-        window.FP.error('No se pudo crear la rutina', error.message);
+        avisoError('No se pudo crear la rutina', error.message);
     }
 };
 
 // Cerrar sesión.
-document.getElementById('logout').onclick = (event) => {
+document.getElementById('logout').onclick = async (event) => {
     event.preventDefault();
-    window.FP.cerrarSesion();
+    await API.request('/logout', 'POST');
+    window.location.href = '../../index.html';
 };
 
-// Inicio: exige sesión de entrenador y carga el panel.
+// Inicio: comprueba la sesión y carga el panel.
 (async () => {
-    await window.FP.exigirSesion('entrenador');
+    const sesion = await API.request('/me');
+    if (sesion.status !== 'success' || sesion.usuario.rol !== 'entrenador') {
+        window.location.href = 'login.html';
+        return;
+    }
     await load();
 })().catch(() => {});

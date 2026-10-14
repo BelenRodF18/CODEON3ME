@@ -1,7 +1,6 @@
 /* ==========================================================================
    FitPower · Web pública
-   Menú, carrusel de profesionales, páginas de programas y planes (desde la
-   API) y botón "Mi panel" cuando hay una sesión abierta.
+   Menú, carrusel de profesionales y páginas de programas y planes.
    ========================================================================== */
 
 // --- Lógica General: Navegación y Slider ---
@@ -34,8 +33,7 @@ function moverSlider(indiceBloque) {
 }
 
 // --- Presentación de los planes ---
-// Precio, descripción, programas y entrenadores vienen de MySQL (/api/planes).
-// Acá solo queda lo visual: color y beneficios comerciales de cada plan.
+// Color y beneficios de cada plan (el resto viene de la API).
 const presentacionPlanes = {
     basico: {
         color: "#A0A0A0",
@@ -56,7 +54,7 @@ const escaparHtml = (valor) => String(valor ?? "").replace(/[&<>'"]/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;"
 }[c]));
 
-// Pide programas o planes a la API pública (API.request de api.js).
+// Pide programas o planes a la API.
 async function pedirCatalogo(ruta) {
     const datos = await API.request(ruta);
     if (datos.status !== "success") throw new Error(datos.message || "No se pudo cargar la información");
@@ -132,10 +130,8 @@ function renderPlan(cont, plan) {
 }
 
 // --- Sesión abierta ---
-// Si el usuario ya inició sesión, el botón "Iniciar Sesión" pasa a ser
-// "Mi panel" y lleva a su dashboard, así puede volver sin loguearse de nuevo.
+// Con sesión abierta, "Iniciar Sesión" pasa a ser "Mi panel".
 async function mostrarAccesoAlPanel() {
-    // Sin API o sin sesión se deja "Iniciar Sesión".
     const sesion = await API.request("/sesion");
     if (sesion.status !== "success" || !sesion.usuario) return;
     const usuario = sesion.usuario;
@@ -185,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const params = new URLSearchParams(window.location.search);
         const path = window.location.pathname;
 
-        // Carga el programa o plan de la URL y lo dibuja (o avisa que no existe).
+        // Carga el programa o plan de la URL y lo dibuja.
         const mostrar = (ruta, clave, render, noEncontrado) => {
             if (!params.get(clave)) {
                 cont.innerHTML = `<div class="text-center py-5 text-danger">${noEncontrado}</div>`;

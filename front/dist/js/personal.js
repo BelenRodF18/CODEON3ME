@@ -1,11 +1,6 @@
-/* Panel del personal de mantenimiento: reportes de máquinas, estado y chat con el socio.
-   Usa la API /personal/... a través de window.FP.api (ui.js). */
+/* Panel del personal de mantenimiento: reportes de máquinas, estado y chat con el socio. */
 
 const reports = document.getElementById('reports');
-
-// Misma llamada a la API que el resto de los paneles: si la sesión
-// vence o cambia de cuenta, vuelve al login con el motivo.
-const api = window.FP.api;
 
 // Escapa el texto antes de insertarlo en el HTML.
 const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (c) => ({
@@ -16,7 +11,8 @@ const ESTADOS = { abierto: 'Abierto', en_revision: 'En revisión', en_reparacion
 
 // Carga el chat de un reporte.
 const loadMessages = async (id, box) => {
-    const data = await api(`/personal/conversaciones/${id}/mensajes`);
+    const data = await API.request(`/personal/conversaciones/${id}/mensajes`);
+    if (data.status === 'error') throw new Error(data.message);
     box.innerHTML = data.mensajes.map((message) =>
         `<div class="chat-message"><strong>${escapeHtml(message.nombre)}:</strong> ${escapeHtml(message.mensaje)}</div>`
     ).join('') || '<small>No hay mensajes.</small>';
@@ -24,7 +20,8 @@ const loadMessages = async (id, box) => {
 
 // Carga los reportes con su estado y chat.
 const load = async () => {
-    const data = await api('/personal/conversaciones');
+    const data = await API.request('/personal/conversaciones');
+    if (data.status === 'error') throw new Error(data.message);
 
     reports.innerHTML = data.conversaciones.map((item) => `<article class="socio-card full">
         <div class="socio-status">
@@ -58,11 +55,12 @@ const load = async () => {
     document.querySelectorAll('.save').forEach((button) => button.onclick = async () => {
         const state = document.querySelector(`.state[data-id="${button.dataset.id}"]`).value;
         try {
-            await api(`/personal/conversaciones/${button.dataset.id}/estado`, 'PUT', { estado: state });
-            window.FP.exito('Estado actualizado', 'El reporte pasó a "' + ESTADOS[state] + '".');
+            const resultado = await API.request(`/personal/conversaciones/${button.dataset.id}/estado`, 'PUT', { estado: state });
+            if (resultado.status === 'error') throw new Error(resultado.message);
+            avisoExito('Estado actualizado', 'El reporte pasó a "' + ESTADOS[state] + '".');
             load();
         } catch (error) {
-            window.FP.error('No se pudo cambiar el estado', error.message);
+            avisoError('No se pudo cambiar el estado', error.message);
         }
     });
 
@@ -71,11 +69,12 @@ const load = async () => {
         event.preventDefault();
         const input = form.querySelector('input');
         try {
-            await api(`/personal/conversaciones/${form.dataset.id}/mensajes`, 'POST', { mensaje: input.value });
+            const resultado = await API.request(`/personal/conversaciones/${form.dataset.id}/mensajes`, 'POST', { mensaje: input.value });
+            if (resultado.status === 'error') throw new Error(resultado.message);
             input.value = '';
             load();
         } catch (error) {
-            window.FP.error('No se pudo enviar la respuesta', error.message);
+            avisoError('No se pudo enviar la respuesta', error.message);
         }
     });
 };
@@ -84,13 +83,18 @@ const load = async () => {
 document.getElementById('refresh').onclick = () => load().catch((error) => reports.textContent = error.message);
 
 // Cerrar sesión.
-document.getElementById('logout').onclick = (event) => {
+document.getElementById('logout').onclick = async (event) => {
     event.preventDefault();
-    window.FP.cerrarSesion();
+    await API.request('/logout', 'POST');
+    window.location.href = '../../index.html';
 };
 
-// Inicio: exige sesión del personal y carga los reportes.
+// Inicio: comprueba la sesión y carga los reportes.
 (async () => {
-    await window.FP.exigirSesion('personal');
+    const sesion = await API.request('/me');
+    if (sesion.status !== 'success' || sesion.usuario.rol !== 'personal') {
+        window.location.href = 'login.html';
+        return;
+    }
     await load();
 })().catch((error) => { reports.textContent = error.message; });

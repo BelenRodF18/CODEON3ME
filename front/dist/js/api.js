@@ -1,5 +1,4 @@
-// front/dist/js/api.js
-// Cliente HTTP centralizado: todas las páginas hablan con PHP a través de API.request.
+// Cliente HTTP: todas las páginas hablan con la API a través de API.request.
 
 const API = {
     // En Docker o Laragon
@@ -15,7 +14,7 @@ const API = {
 
         // GET no lleva body. POST/PUT sí.
         if (data instanceof FormData) {
-            // Formulario con archivos (foto del reporte): el navegador arma la cabecera.
+            // Formulario con archivos (foto del reporte).
             delete opciones.headers;
             opciones.body = data;
         } else if (data) {

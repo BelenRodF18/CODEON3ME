@@ -1,8 +1,6 @@
-/* Acciones de editar/eliminar sobre el historial de series del socio.
-   Usa los modales y toasts de ui.js: nada de prompt()/confirm()/alert(). */
+/* Acciones de editar/eliminar sobre el historial de series del socio. */
 
 (() => {
-    const { api, escapar, exito, error: errorToast, modal, confirmar } = window.FP;
 
     // Formulario para corregir una serie.
     const formularioSerie = (serie) =>
@@ -17,7 +15,7 @@
         '</div>';
 
     // Modal para editar una serie del historial.
-    const editarSerie = (serie, recargar) => modal({
+    const editarSerie = (serie, recargar) => abrirModal({
         titulo: 'Editar serie',
         descripcion: serie.ejercicio + ' · ' + serie.fecha,
         cuerpo: formularioSerie(serie),
@@ -26,17 +24,18 @@
             const datos = Object.fromEntries(new FormData(formulario));
 
             try {
-                await api('/socio/series/' + serie.id, 'PUT', {
+                const resultado = await API.request('/socio/series/' + serie.id, 'PUT', {
                     peso: datos.peso,
                     repeticiones: datos.repeticiones,
                     descanso_segundos: serie.descanso_segundos,
                     sensacion: datos.sensacion
                 });
-                exito('Serie actualizada', 'Tu historial ya refleja el cambio.');
+                if (resultado.status === 'error') throw new Error(resultado.message);
+                avisoExito('Serie actualizada', 'Tu historial ya refleja el cambio.');
                 recargar();
                 return true;
             } catch (fallo) {
-                errorToast('No se pudo guardar', fallo.message);
+                avisoError('No se pudo guardar', fallo.message);
                 return false;
             }
         }
@@ -55,21 +54,19 @@
         if (!confirmado) return;
 
         try {
-            await api('/socio/series/' + serie.id, 'DELETE');
-            exito('Registro eliminado', 'La serie ya no figura en tu historial.');
+            const resultado = await API.request('/socio/series/' + serie.id, 'DELETE');
+            if (resultado.status === 'error') throw new Error(resultado.message);
+            avisoExito('Registro eliminado', 'La serie ya no figura en tu historial.');
             recargar();
         } catch (fallo) {
-            errorToast('No se pudo eliminar', fallo.message);
+            avisoError('No se pudo eliminar', fallo.message);
         }
     };
 
-    // El historial lo dibuja el dashboard; se recarga para verlo actualizado.
+    // Recarga el historial.
     const recargar = () => window.location.reload();
 
-    /**
-     * Agrega Editar/Eliminar a cada fila que todavía no los tiene. El historial
-     * se vuelve a dibujar después de cada serie, así que se revisa en cada cambio.
-     */
+    // Agrega Editar/Eliminar a cada fila del historial.
     let buscando = false;
     const renderActions = async () => {
         const lista = document.getElementById('series-list');
@@ -81,7 +78,8 @@
 
         buscando = true;
         try {
-            const datos = await api('/socio/rendimiento');
+            const datos = await API.request('/socio/rendimiento');
+            if (datos.status === 'error') throw new Error(datos.message);
 
             pendientes.forEach((fila) => {
                 const serie = datos.series.find((item) => String(item.id) === fila.dataset.seriesId);

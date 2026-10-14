@@ -1,14 +1,9 @@
-/* Portal del socio: membresía, programas, rutinas, cronómetros, QR de acceso,
-   rendimiento con récords y conversaciones con el equipo. */
+/* Portal del socio */
 
 const state = { me: null, timer: null, qrTimer: null, qrSeconds: 0, workoutTimer: null, workoutRemaining: 0, workoutRunning: false, notices: 0 };
 const $ = (id) => document.getElementById(id);
 // Escapa el texto antes de insertarlo en el HTML.
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[c]));
-
-// Misma llamada a la API que el resto de los paneles: si la sesión
-// vence o cambia de cuenta, vuelve al login con el motivo.
-const api = window.FP.api;
 
 // Aviso breve abajo a la derecha.
 const toast = (message) => {
@@ -58,7 +53,8 @@ const renderNotices = (data) => {
 // Consulta las novedades; si llegó una nueva, la anuncia.
 const checkNotices = async (announce = false) => {
     try {
-        const data = await api('/socio/avisos');
+        const data = await API.request('/socio/avisos');
+        if (data.status === 'error') throw new Error(data.message);
         if (announce && data.pendientes > state.notices) {
             const latest = data.avisos[0];
             toast(`${latest.etiqueta || 'Tu reporte'}: ${latest.mensaje}`);
@@ -72,7 +68,8 @@ const checkNotices = async (announce = false) => {
 const markNoticesRead = async () => {
     if (!state.notices) return;
     try {
-        await api('/socio/avisos/leidos', 'POST');
+        const resultado = await API.request('/socio/avisos/leidos', 'POST');
+        if (resultado.status === 'error') throw new Error(resultado.message);
         state.notices = 0;
         renderNotices({ pendientes: 0, avisos: [] });
     } catch (error) {}
@@ -80,7 +77,8 @@ const markNoticesRead = async () => {
 
 // Inicio: membresía, afluencia, programas y rutinas.
 const loadDashboard = async () => {
-    const data = await api('/socio/resumen');
+    const data = await API.request('/socio/resumen');
+    if (data.status === 'error') throw new Error(data.message);
     const user = state.me.usuario;
     $('saludo').textContent = 'Hola, ' + user.nombre.split(' ')[0];
     $('avatar').textContent = user.nombre.split(' ').map((part) => part[0]).slice(0, 2).join('');
@@ -97,7 +95,8 @@ const loadDashboard = async () => {
     $('home-programas').innerHTML = data.programas.map(renderProgram).join('') || '<div class="empty">Todavía no estás inscripto en ningún programa. Consultá en recepción.</div>';
     $('home-rutinas').innerHTML = data.rutinas.map(renderRoutine).join('') || '<div class="empty">Todavía no tienes rutinas asignadas.</div>';
     bindRoutineToggle();
-    const routines = await api('/socio/rutinas');
+    const routines = await API.request('/socio/rutinas');
+    if (routines.status === 'error') throw new Error(routines.message);
     $('rutinas-list').innerHTML = routines.rutinas.map(renderRoutine).join('') || '<div class="empty">Todavía no tienes rutinas asignadas.</div>';
     bindRoutineToggle();
 };
@@ -105,7 +104,8 @@ const loadDashboard = async () => {
 // Genera el QR de acceso y lo renueva cuando vence.
 const makeQr = async () => {
     try {
-        const data = await api('/socio/qr');
+        const data = await API.request('/socio/qr');
+        if (data.status === 'error') throw new Error(data.message);
         $('qr-code').innerHTML = '';
         new QRCode($('qr-code'), { text: data.token, width: 185, height: 185, colorDark: '#0a0d0b', colorLight: '#ffffff' });
         state.qrSeconds = data.vigencia_segundos || 60;
@@ -123,8 +123,8 @@ const makeQr = async () => {
 
 // Rendimiento: récords, historial de series y ejercicios.
 const loadPerformance = async () => {
-    const data = await api('/socio/rendimiento');
-    // Se conserva el ejercicio elegido para cargar varias series seguidas.
+    const data = await API.request('/socio/rendimiento');
+    if (data.status === 'error') throw new Error(data.message);
     const chosen = $('serie-ejercicio').value;
     $('serie-ejercicio').innerHTML = data.ejercicios.map((exercise) => `<option value="${exercise.id}">${exercise.nombre}</option>`).join('');
     if (data.ejercicios.some((exercise) => String(exercise.id) === chosen)) $('serie-ejercicio').value = chosen;
@@ -140,7 +140,8 @@ const loadPerformance = async () => {
 
 // Conversaciones con el equipo y sus chats.
 const loadReports = async () => {
-    const data = await api('/socio/reportes');
+    const data = await API.request('/socio/reportes');
+    if (data.status === 'error') throw new Error(data.message);
     $('reportes-list').innerHTML = data.reportes.length
         ? data.reportes.map((report) => `<div class="report-item"><header><strong>${report.tipo === 'sugerencia' ? 'Sugerencia: ' : ''}${report.etiqueta}${Number(report.sin_leer) ? ` <span class="tag suggestion">${report.sin_leer} ${Number(report.sin_leer) === 1 ? 'novedad' : 'novedades'}</span>` : ''}</strong><span class="tag ${report.tipo === 'sugerencia' ? 'suggestion' : ''} ${report.estado === 'solucionado' ? 'ok' : ''}">${({ abierto: 'Abierto', en_revision: 'En revisión', en_reparacion: 'En reparación', solucionado: 'Solucionado' })[report.estado] || report.estado}</span></header><p>${report.descripcion}</p><small class="socio-meta">${report.creado} · ${report.tipo === 'sugerencia' ? 'Enviada al administrador' : 'Enviada a mantenimiento'}</small><div class="chat-box"><div class="chat-messages" id="chat-${report.id}">Cargando conversación...</div><form class="chat-form" data-report-id="${report.id}" style="display:flex;gap:7px"><input name="mensaje" placeholder="Escribe un mensaje..." required><button class="socio-button" type="submit">Enviar</button></form></div></div>`).join('')
         : '<div class="empty">Aún no tienes conversaciones.</div>';
@@ -152,7 +153,8 @@ const loadReports = async () => {
 // Mensajes del chat de un reporte.
 const loadMessages = async (report) => {
     try {
-        const data = await api(`/socio/reportes/${report.id}/mensajes`);
+        const data = await API.request(`/socio/reportes/${report.id}/mensajes`);
+        if (data.status === 'error') throw new Error(data.message);
         const box = $('chat-' + report.id);
         box.innerHTML = data.mensajes.map((message) => `<div class="chat-message"><strong>${message.nombre}:</strong> ${message.mensaje}</div>`).join('');
         box.scrollTop = box.scrollHeight;
@@ -165,7 +167,8 @@ const sendMessage = async (event) => {
     const form = event.currentTarget;
     const input = form.querySelector('input');
     try {
-        await api(`/socio/reportes/${form.dataset.reportId}/mensajes`, 'POST', { mensaje: input.value });
+        const resultado = await API.request(`/socio/reportes/${form.dataset.reportId}/mensajes`, 'POST', { mensaje: input.value });
+        if (resultado.status === 'error') throw new Error(resultado.message);
         input.value = '';
         loadReports();
         toast('Mensaje enviado');
@@ -194,7 +197,8 @@ $('reporte-form').addEventListener('submit', async (event) => {
     body.append('descripcion', $('reporte-descripcion').value);
     if (type === 'mantenimiento' && $('reporte-foto').files[0]) body.append('foto', $('reporte-foto').files[0]);
     try {
-        await api('/socio/reportes', 'POST', body);
+        const resultado = await API.request('/socio/reportes', 'POST', body);
+        if (resultado.status === 'error') throw new Error(resultado.message);
         event.target.reset();
         updateConversationForm();
         loadReports();
@@ -209,13 +213,14 @@ $('serie-form').addEventListener('submit', async (event) => {
     event.preventDefault();
     const descanso = Number($('serie-descanso').value);
     try {
-        const saved = await api('/socio/series', 'POST', {
+        const saved = await API.request('/socio/series', 'POST', {
             ejercicio_id: $('serie-ejercicio').value,
             peso: $('serie-peso').value,
             repeticiones: $('serie-reps').value,
             descanso_segundos: descanso,
             sensacion: $('serie-sensacion').value
         });
+        if (saved.status === 'error') throw new Error(saved.message);
         loadPerformance();
         startTimer(descanso);
         toast(saved.record ? '¡Nuevo récord personal!' : 'Serie guardada');
@@ -229,7 +234,6 @@ const startTimer = (seconds) => {
     clearInterval(state.timer);
     $('timer').hidden = false;
     let left = seconds;
-    // Un segundo menos; al llegar a cero avisa y vibra.
     const tick = () => {
         $('timer-value').textContent = `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`;
         if (left <= 0) {
@@ -320,16 +324,21 @@ $('workout-seconds').addEventListener('input', (event) => {
 
 // Cerrar sesión.
 $('cerrar-sesion').addEventListener('click', async () => {
-    window.FP.cerrarSesion();
+    await API.request('/logout', 'POST');
+    window.location.href = '../../index.html';
 });
 
-// Inicio: exige sesión de socio, carga el portal y revisa novedades cada 30 s.
+// Inicio: comprueba la sesión, carga el portal y revisa novedades cada 30 s.
 (async () => {
     try {
-        state.me = { usuario: await window.FP.exigirSesion('socio') };
+        const sesion = await API.request('/me');
+        if (sesion.status !== 'success' || sesion.usuario.rol !== 'socio') {
+            window.location.href = 'login.html';
+            return;
+        }
+        state.me = { usuario: sesion.usuario };
         await loadDashboard();
         await checkNotices(true);
-        // Mientras la sesión está abierta, las novedades llegan solas.
         setInterval(() => checkNotices(true), 30000);
     } catch (error) {
         toast(error.message);

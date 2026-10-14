@@ -1,6 +1,6 @@
-/* Inicio de sesión: con usuario y contraseña, y redirección al panel según el rol. */
+/* Inicio de sesión y redirección al panel según el rol. */
 
-// Panel de cada rol, relativo a esta página.
+// Panel de cada rol.
 const PANELES = {
     admin: 'dashboard-admin.html',
     entrenador: 'dashboard-entrenador.html',
@@ -9,43 +9,23 @@ const PANELES = {
     personal: 'dashboard-personal.html'
 };
 
-// Por qué se volvió al login desde un panel.
-const MOTIVOS = {
-    expirada: 'Tu sesión venció por inactividad. Iniciá sesión de nuevo.',
-    otra_cuenta: 'En este navegador se inició sesión con otra cuenta. Iniciá sesión de nuevo para seguir.'
-};
-
 const mensaje = document.getElementById('mensaje-login');
 
-/** Muestra un aviso debajo del formulario (error en rojo, info en verde). */
+// Muestra un aviso debajo del formulario.
 const mostrarMensaje = (texto, tipo = 'error') => {
     mensaje.textContent = texto;
     mensaje.className = (tipo === 'error' ? 'text-danger' : 'text-success') + ' small mb-3';
     mensaje.style.display = texto ? 'block' : 'none';
 };
 
-// Si ya hay una sesión abierta, no hace falta volver a loguearse: se va a su panel.
+// Si ya hay sesión, va directo a su panel.
 (async () => {
-    const motivo = new URLSearchParams(location.search).get('motivo');
-    if (MOTIVOS[motivo]) mostrarMensaje(MOTIVOS[motivo], 'info');
-
-    // Sin API o sin sesión se muestra el formulario igual.
     const sesion = await API.request('/sesion');
     if (sesion.status !== 'success' || !sesion.usuario) return;
     const panel = PANELES[sesion.usuario.rol];
     if (!panel) return;
 
-    if (motivo === 'otra_cuenta') {
-        mensaje.innerHTML = '';
-        mostrarMensaje(MOTIVOS.otra_cuenta + ' Ahora la sesión abierta es de ' + sesion.usuario.nombre + '.', 'info');
-        const enlace = document.createElement('a');
-        enlace.href = panel;
-        enlace.textContent = ' Ir a su panel';
-        enlace.className = 'text-white';
-        mensaje.appendChild(enlace);
-        return;
-    }
-    window.location.replace(panel);
+    window.location.href = panel;
 })();
 
 // Iniciar sesión y redirigir al panel de su rol.
@@ -62,7 +42,6 @@ document.getElementById('form-login').addEventListener('submit', async function(
         password: password
     });
 
-    // Si sale mal (o la API no responde) se queda en el login con el mensaje.
     if (respuesta.status !== 'success') {
         mostrarMensaje(respuesta.message || 'Credenciales inválidas');
         return;

@@ -1,13 +1,11 @@
 /* ==========================================================================
    FitPower · Panel de Recepción
-   Lee el QR del socio con la cámara, lo manda al backend y muestra el
-   resultado del ingreso. El token queda registrado en MySQL recién acá.
+   Lector de QR, ingresos y salidas.
    ========================================================================== */
 
 (function () {
     'use strict';
 
-    const { api, escapar, exito, error: errorToast, aviso, confirmar, badge, vacio } = window.FP;
 
     const $ = (id) => document.getElementById(id);
 
@@ -20,7 +18,7 @@
         ultimoMomento: 0
     };
 
-    /** Evita releer el mismo QR mientras la cámara sigue apuntando al código. */
+    // Evita leer dos veces el mismo QR.
     const ES_REPETIDO = (token) => token === estado.ultimoToken && Date.now() - estado.ultimoMomento < 3000;
 
     // ------------------------------------------------------- Estado visual
@@ -76,12 +74,12 @@
                 (socio ? '<p class="rec-detalle">' + escapar(socio.nombre) + '<br>' + escapar(socio.nombre_usuario) + '</p>' : '');
         }
 
-        // Aviso sonoro corto: en un mostrador no siempre se mira la pantalla.
+        // Aviso sonoro.
         pitar(respuesta.permitido);
         if (navigator.vibrate) navigator.vibrate(respuesta.permitido ? 120 : [90, 70, 90]);
     };
 
-    /** Tono generado con WebAudio: no hace falta ningún archivo de sonido. */
+    // Tono corto con WebAudio.
     const pitar = (correcto) => {
         try {
             const Audio = window.AudioContext || window.webkitAudioContext;
@@ -111,30 +109,28 @@
         fijarEstado('Validando código...', 'proceso');
 
         try {
-            // Un ingreso rechazado llega con status 'error' pero trae "permitido";
-            // sin ese dato fue un problema de sesión, de conexión o un token vacío.
+            // Un ingreso rechazado también trae "permitido".
             const datos = await API.request('/recepcion/accesos/canjear', 'POST', { token });
             if (datos.permitido === undefined) {
-                await window.FP.revisarSesion();
                 throw new Error(datos.message || 'No se pudo completar la operación');
             }
 
             mostrarResultado(datos);
 
             if (datos.permitido && datos.movimiento === 'salida') {
-                exito('Salida registrada', (datos.socio ? datos.socio.nombre : 'Socio') + ' se retiró del gimnasio.');
+                avisoExito('Salida registrada', (datos.socio ? datos.socio.nombre : 'Socio') + ' se retiró del gimnasio.');
                 fijarEstado('Listo para el siguiente socio', 'ok');
             } else if (datos.permitido) {
-                exito('Ingreso autorizado', (datos.socio ? datos.socio.nombre : 'Socio') + ' ingresó correctamente.');
+                avisoExito('Ingreso autorizado', (datos.socio ? datos.socio.nombre : 'Socio') + ' ingresó correctamente.');
                 fijarEstado('Listo para el siguiente socio', 'ok');
             } else {
-                errorToast('Ingreso rechazado', datos.message || 'QR inválido');
+                avisoError('Ingreso rechazado', datos.message || 'QR inválido');
                 fijarEstado(datos.message || 'QR inválido', 'no');
             }
 
             await cargarHistorial();
         } catch (fallo) {
-            errorToast('No se pudo validar el código', fallo.message);
+            avisoError('No se pudo validar el código', fallo.message);
             fijarEstado('Error de conexión', 'no');
         } finally {
             estado.procesando = false;
@@ -151,12 +147,12 @@
         if (estado.escaneando) return;
 
         if (typeof Html5Qrcode === 'undefined') {
-            aviso('Lector no disponible', 'No se pudo cargar la librería del escáner. Usá el ingreso manual.');
+            avisoAtencion('Lector no disponible', 'No se pudo cargar la librería del escáner. Usá el ingreso manual.');
             return;
         }
 
         if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-            aviso('Cámara bloqueada', 'El navegador solo permite la cámara en HTTPS o en localhost. Usá el ingreso manual.');
+            avisoAtencion('Cámara bloqueada', 'El navegador solo permite la cámara en HTTPS o en localhost. Usá el ingreso manual.');
             return;
         }
 
@@ -190,7 +186,7 @@
             const mensaje = String(fallo && fallo.message ? fallo.message : fallo);
             const permisoDenegado = /permission|denied|NotAllowed/i.test(mensaje);
 
-            errorToast(
+            avisoError(
                 permisoDenegado ? 'Permiso de cámara denegado' : 'No se pudo abrir la cámara',
                 permisoDenegado
                     ? 'Habilitá la cámara para este sitio o usá el ingreso manual.'
@@ -223,7 +219,6 @@
         const permitido = acceso.estado === 'Permitido';
 
         return '<tr>' +
-            // El usuario va en el title: en una columna angosta el nombre alcanza.
             '<td title="' + escapar(acceso.nombre_usuario) + '"><span class="fp-principal">' +
             escapar(acceso.socio) + '</span></td>' +
             '<td>' + escapar(acceso.fecha || '—') + '<span class="fp-secundario">' + (permitido ? 'Ingreso ' : '') + escapar(acceso.hora || '') +
@@ -241,7 +236,8 @@
     // Contadores del día e historial de ingresos y salidas.
     const cargarHistorial = async () => {
         try {
-            const datos = await api('/recepcion/resumen');
+            const datos = await API.request('/recepcion/resumen');
+            if (datos.status === 'error') throw new Error(datos.message);
             $('kpi-permitidos').textContent = datos.hoy.permitidos;
             $('kpi-denegados').textContent = datos.hoy.denegados;
             $('kpi-adentro').textContent = datos.hoy.adentro;
@@ -273,11 +269,12 @@
             if (!boton) return;
 
             try {
-                const datos = await api('/recepcion/accesos/' + boton.dataset.id + '/salida', 'POST');
-                exito('Salida registrada', datos.socio.nombre + ' se retiró a las ' + datos.acceso.hora + '.');
+                const datos = await API.request('/recepcion/accesos/' + boton.dataset.id + '/salida', 'POST');
+                if (datos.status === 'error') throw new Error(datos.message);
+                avisoExito('Salida registrada', datos.socio.nombre + ' se retiró a las ' + datos.acceso.hora + '.');
                 await cargarHistorial();
             } catch (fallo) {
-                errorToast('No se pudo registrar la salida', fallo.message);
+                avisoError('No se pudo registrar la salida', fallo.message);
             }
         });
 
@@ -299,7 +296,8 @@
             if (!confirmado) return;
 
             await detenerEscaner();
-            window.FP.cerrarSesion();
+            await API.request('/logout', 'POST');
+            window.location.href = '../../index.html';
         });
 
         // Si se cierra la pestaña, liberar la cámara.
@@ -309,7 +307,12 @@
     // -------------------------------------------------------------- Inicio
 
     (async () => {
-        estado.operador = await window.FP.exigirSesion(['recepcion', 'admin']);
+        const sesion = await API.request('/me');
+        if (sesion.status !== 'success' || !['recepcion', 'admin'].includes(sesion.usuario.rol)) {
+            window.location.href = 'login.html';
+            return;
+        }
+        estado.operador = sesion.usuario;
         $('operador').textContent = estado.operador.nombre_usuario;
 
         enlazarEventos();

@@ -1,12 +1,10 @@
 /* ==========================================================================
    FitPower · Panel de administración
-   UI → API → MySQL → API → UI. Sin alert(), sin datos hardcodeados.
    ========================================================================== */
 
 (function () {
     'use strict';
 
-    const { api, escapar, exito, error: errorToast, modal, confirmar, badge, vacio, cargando, conCarga } = window.FP;
 
     const $ = (id) => document.getElementById(id);
 
@@ -38,7 +36,7 @@
     // ------------------------------------------------------- Mensajes de API
 
     const mostrarFallo = (fallo, titulo) => {
-        errorToast(titulo || 'No se pudo completar la operación', fallo.message);
+        avisoError(titulo || 'No se pudo completar la operación', fallo.message);
     };
 
     // ---------------------------------------------------------- Tabla de usuarios
@@ -156,7 +154,7 @@
         '<p class="fp-campo-error" data-error-de="password"></p></div>' +
         '</div>';
 
-    /** Muestra el error del backend junto al campo que lo causó. */
+    // Muestra el error junto al campo que lo causó.
     const marcarError = (formulario, fallo) => {
         formulario.querySelectorAll('[data-campo]').forEach((campo) => delete campo.dataset.error);
         formulario.querySelectorAll('.fp-campo-error').forEach((nodo) => { nodo.textContent = ''; });
@@ -172,7 +170,7 @@
             return;
         }
 
-        errorToast('No se pudo guardar', fallo.message);
+        avisoError('No se pudo guardar', fallo.message);
     };
 
     // Lee el formulario y normaliza los datos antes de enviarlos.
@@ -183,8 +181,7 @@
         return datos;
     };
 
-    // Misma regla que UsuarioModel::FORMATO_USUARIO. El backend es quien manda:
-    // esto solo da feedback inmediato.
+    // Formato válido del nombre de usuario.
     const FORMATO_USUARIO = /^[a-z0-9]+([._-][a-z0-9]+)*$/;
 
     // Valida el nombre de usuario y muestra el error junto al campo.
@@ -201,7 +198,7 @@
     };
 
     // Modal para crear un usuario nuevo.
-    const abrirCrearUsuario = () => modal({
+    const abrirCrearUsuario = () => abrirModal({
         titulo: 'Nuevo usuario',
         descripcion: 'Se guarda en MySQL y queda disponible de inmediato.',
         cuerpo: formularioUsuario(null),
@@ -212,9 +209,10 @@
             if (!usuarioValido(formulario, datos)) return false;
 
             try {
-                const respuesta = await api('/admin/usuarios', 'POST', datos);
+                const respuesta = await API.request('/admin/usuarios', 'POST', datos);
+                if (respuesta.status === 'error') throw Object.assign(new Error(respuesta.message), { datos: respuesta });
                 await recargarUsuarios([respuesta.usuario.id]);
-                exito('Usuario creado correctamente', respuesta.usuario.nombre + ' ya está disponible en el sistema.');
+                avisoExito('Usuario creado correctamente', respuesta.usuario.nombre + ' ya está disponible en el sistema.');
                 return true;
             } catch (fallo) {
                 marcarError(formulario, fallo);
@@ -224,7 +222,7 @@
     });
 
     // Modal para editar un usuario existente.
-    const abrirEditarUsuario = (usuario) => modal({
+    const abrirEditarUsuario = (usuario) => abrirModal({
         titulo: 'Editar usuario',
         descripcion: 'Los cambios se guardan en MySQL y se reflejan al instante.',
         cuerpo: formularioUsuario(usuario),
@@ -236,9 +234,10 @@
             if (!datos.password) delete datos.password;
 
             try {
-                const respuesta = await api('/admin/usuarios/' + usuario.id, 'PUT', datos);
+                const respuesta = await API.request('/admin/usuarios/' + usuario.id, 'PUT', datos);
+                if (respuesta.status === 'error') throw Object.assign(new Error(respuesta.message), { datos: respuesta });
                 await recargarUsuarios([usuario.id]);
-                exito('Usuario actualizado', 'Se guardaron los datos de ' + respuesta.usuario.nombre + '.');
+                avisoExito('Usuario actualizado', 'Se guardaron los datos de ' + respuesta.usuario.nombre + '.');
                 return true;
             } catch (fallo) {
                 marcarError(formulario, fallo);
@@ -262,9 +261,10 @@
         if (!confirmado) return;
 
         try {
-            const respuesta = await api('/admin/usuarios/' + usuario.id + '/estado', 'PUT', { activo: activar });
+            const respuesta = await API.request('/admin/usuarios/' + usuario.id + '/estado', 'PUT', { activo: activar });
+            if (respuesta.status === 'error') throw new Error(respuesta.message);
             await recargarUsuarios([usuario.id]);
-            exito(
+            avisoExito(
                 activar ? 'Usuario habilitado' : 'Usuario dado de baja',
                 respuesta.usuario.nombre + ' figura ahora como ' + (activar ? 'activo' : 'inactivo') + '.'
             );
@@ -275,7 +275,7 @@
 
     // -------------------------------------------------------------- Borrado
 
-    // [singular, plural] para que no quede "1 socios".
+    // [singular, plural] de cada dependencia.
     const ETIQUETAS_DEPENDENCIA = {
         socios_asignados: [
             'socio que tiene asignado como entrenador',
@@ -316,7 +316,8 @@
         let requiereExtra = false;
 
         try {
-            const respuesta = await api('/admin/usuarios/' + usuario.id + '/dependencias');
+            const respuesta = await API.request('/admin/usuarios/' + usuario.id + '/dependencias');
+            if (respuesta.status === 'error') throw new Error(respuesta.message);
             dependencias = respuesta.dependencias;
             requiereExtra = respuesta.requiere_confirmacion_extra;
         } catch (fallo) {
@@ -335,7 +336,7 @@
                   'Entiendo que también se eliminarán los registros relacionados que se listan arriba.</label></div>'
                 : '');
 
-        const confirmado = await modal({
+        const confirmado = await abrirModal({
             titulo: 'Eliminar usuario',
             cuerpo,
             aceptar: 'Eliminar definitivamente',
@@ -346,10 +347,11 @@
                 if (forzar && !forzar.checked) return false;
 
                 try {
-                    await api('/admin/usuarios/' + usuario.id + (forzar ? '?forzar=1' : ''), 'DELETE');
+                    const resultado = await API.request('/admin/usuarios/' + usuario.id + (forzar ? '?forzar=1' : ''), 'DELETE');
+                    if (resultado.status === 'error') throw new Error(resultado.message);
                     return true;
                 } catch (fallo) {
-                    errorToast('No se pudo eliminar', fallo.message);
+                    avisoError('No se pudo eliminar', fallo.message);
                     return false;
                 }
             }
@@ -358,13 +360,12 @@
         if (confirmado !== true) return;
 
         await recargarUsuarios();
-        exito('Usuario eliminado', usuario.nombre + ' fue borrado del sistema.');
+        avisoExito('Usuario eliminado', usuario.nombre + ' fue borrado del sistema.');
     };
 
     // ------------------------------------------------------- Carga de datos
 
-    // Un alta, edición o baja también cambia la lista de socios y de
-    // entrenadores de la pestaña Socios: se recarga el resumen completo.
+    // Recarga el resumen después de un cambio en usuarios.
     const recargarUsuarios = async (idsResaltados = []) => {
         await cargarTodo();
         pintarUsuarios(idsResaltados);
@@ -376,7 +377,8 @@
         $('socios-admin').innerHTML = cargando(3);
         $('programas-admin').innerHTML = cargando(3);
 
-        const datos = await api('/admin/resumen');
+        const datos = await API.request('/admin/resumen');
+        if (datos.status === 'error') throw new Error(datos.message);
         estado.usuarios = datos.usuarios;
         estado.roles = datos.roles;
         estado.socios = datos.socios;
@@ -396,7 +398,7 @@
 
     const planPorId = (id) => estado.planes.find((plan) => String(plan.id) === String(id)) || null;
 
-    /** Checkboxes con los programas que incluye el plan, cada uno con su entrenador. */
+    // Programas que incluye el plan, con su entrenador.
     const casillasProgramas = (socioId, plan, inscriptos) => {
         if (!plan) return '<p class="socio-meta">Asigná un plan para inscribirlo en programas.</p>';
 
@@ -420,7 +422,7 @@
                 escapar(entrenador.nombre) + '</option>')
             .join('');
 
-    /** Entrenador personal y programas dependen del plan elegido en la tarjeta. */
+    // Actualiza entrenador y programas según el plan elegido.
     const pintarBloquePlan = (socioId) => {
         const socio = estado.socios.find((item) => String(item.id) === String(socioId));
         const plan = planPorId(document.querySelector('.admin-plan[data-id="' + socioId + '"]').value);
@@ -530,22 +532,24 @@
             .map((casilla) => Number(casilla.value));
 
         if (!valor('.admin-plan')) {
-            errorToast('Falta el plan', 'Elegí un plan antes de guardar.');
+            avisoError('Falta el plan', 'Elegí un plan antes de guardar.');
             return;
         }
 
         await conCarga(boton, async () => {
             try {
-                // El plan va primero: define qué entrenador y qué programas se permiten.
-                await api('/admin/socios/' + id + '/membresia', 'PUT', {
+                const membresia = await API.request('/admin/socios/' + id + '/membresia', 'PUT', {
                     plan_id: valor('.admin-plan'),
                     vencimiento: valor('.admin-date'),
                     estado: valor('.admin-status')
                 });
-                await api('/admin/socios/' + id + '/entrenador', 'PUT', { entrenador_id: valor('.admin-trainer') });
-                await api('/admin/socios/' + id + '/programas', 'PUT', { programas });
+                if (membresia.status === 'error') throw new Error(membresia.message);
+                const entrenador = await API.request('/admin/socios/' + id + '/entrenador', 'PUT', { entrenador_id: valor('.admin-trainer') });
+                if (entrenador.status === 'error') throw new Error(entrenador.message);
+                const inscripcion = await API.request('/admin/socios/' + id + '/programas', 'PUT', { programas });
+                if (inscripcion.status === 'error') throw new Error(inscripcion.message);
                 await cargarTodo();
-                exito('Socio actualizado', 'Se guardaron el plan, el entrenador y los programas.');
+                avisoExito('Socio actualizado', 'Se guardaron el plan, el entrenador y los programas.');
             } catch (fallo) {
                 mostrarFallo(fallo, 'No se pudo guardar el socio');
             }
@@ -559,9 +563,10 @@
 
         await conCarga(boton, async () => {
             try {
-                await api('/admin/programas/' + id + '/entrenador', 'PUT', { entrenador_id: entrenador });
+                const resultado = await API.request('/admin/programas/' + id + '/entrenador', 'PUT', { entrenador_id: entrenador });
+                if (resultado.status === 'error') throw new Error(resultado.message);
                 await cargarTodo();
-                exito('Programa actualizado', 'El entrenador a cargo quedó guardado.');
+                avisoExito('Programa actualizado', 'El entrenador a cargo quedó guardado.');
             } catch (fallo) {
                 mostrarFallo(fallo, 'No se pudo cambiar el entrenador');
             }
@@ -580,7 +585,8 @@
         contenedor.innerHTML = cargando(3);
 
         try {
-            const datos = await api('/admin/conversaciones');
+            const datos = await API.request('/admin/conversaciones');
+            if (datos.status === 'error') throw new Error(datos.message);
 
             if (!datos.conversaciones.length) {
                 contenedor.innerHTML = vacio('Bandeja vacía', 'Cuando un socio envíe una sugerencia o un reporte aparecerá acá.', '✉');
@@ -607,7 +613,8 @@
 
             datos.conversaciones.forEach(async (conversacion) => {
                 try {
-                    const mensajes = await api('/admin/conversaciones/' + conversacion.id + '/mensajes');
+                    const mensajes = await API.request('/admin/conversaciones/' + conversacion.id + '/mensajes');
+                    if (mensajes.status === 'error') throw new Error(mensajes.message);
                     const caja = $('admin-chat-' + conversacion.id);
                     if (!caja) return;
                     caja.innerHTML = mensajes.mensajes
@@ -649,7 +656,7 @@
             });
         });
 
-        // Delegación: la tabla se vuelve a dibujar en cada cambio.
+        // Acciones de la tabla de usuarios.
         $('tabla-usuarios').addEventListener('click', (evento) => {
             const boton = evento.target.closest('[data-accion]');
             if (!boton) return;
@@ -688,10 +695,11 @@
 
             await conCarga(formulario.querySelector('button[type="submit"]'), async () => {
                 try {
-                    await api('/admin/ejercicios', 'POST', Object.fromEntries(new FormData(formulario)));
+                    const resultado = await API.request('/admin/ejercicios', 'POST', Object.fromEntries(new FormData(formulario)));
+                    if (resultado.status === 'error') throw new Error(resultado.message);
                     formulario.reset();
                     await cargarTodo();
-                    exito('Ejercicio agregado', 'Ya está disponible para armar rutinas.');
+                    avisoExito('Ejercicio agregado', 'Ya está disponible para armar rutinas.');
                 } catch (fallo) {
                     mostrarFallo(fallo, 'No se pudo agregar el ejercicio');
                 }
@@ -706,10 +714,11 @@
 
             const entrada = formulario.querySelector('input');
             try {
-                await api('/admin/conversaciones/' + formulario.dataset.id + '/mensajes', 'POST', { mensaje: entrada.value });
+                const resultado = await API.request('/admin/conversaciones/' + formulario.dataset.id + '/mensajes', 'POST', { mensaje: entrada.value });
+                if (resultado.status === 'error') throw new Error(resultado.message);
                 entrada.value = '';
                 await cargarConversaciones();
-                exito('Respuesta enviada', 'El socio ya puede verla en su portal.');
+                avisoExito('Respuesta enviada', 'El socio ya puede verla en su portal.');
             } catch (fallo) {
                 mostrarFallo(fallo, 'No se pudo enviar la respuesta');
             }
@@ -721,9 +730,10 @@
             if (!boton) return;
 
             try {
-                await api('/admin/conversaciones/' + boton.dataset.id + '/estado', 'PUT', { estado: boton.dataset.state });
+                const resultado = await API.request('/admin/conversaciones/' + boton.dataset.id + '/estado', 'PUT', { estado: boton.dataset.state });
+                if (resultado.status === 'error') throw new Error(resultado.message);
                 await cargarConversaciones();
-                exito('Estado actualizado', 'La conversación pasó a "' + ESTADOS_CONVERSACION[boton.dataset.state] + '".');
+                avisoExito('Estado actualizado', 'La conversación pasó a "' + ESTADOS_CONVERSACION[boton.dataset.state] + '".');
             } catch (fallo) {
                 mostrarFallo(fallo, 'No se pudo cambiar el estado');
             }
@@ -741,14 +751,20 @@
             });
             if (!confirmado) return;
 
-            window.FP.cerrarSesion();
+            await API.request('/logout', 'POST');
+            window.location.href = '../../index.html';
         });
     };
 
     // ---------------------------------------------------------------- Inicio
 
     (async () => {
-        estado.usuario = await window.FP.exigirSesion('admin');
+        const sesion = await API.request('/me');
+        if (sesion.status !== 'success' || sesion.usuario.rol !== 'admin') {
+            window.location.href = 'login.html';
+            return;
+        }
+        estado.usuario = sesion.usuario;
 
         $('admin-nombre').textContent = estado.usuario.nombre;
         $('admin-avatar').textContent = estado.usuario.nombre
