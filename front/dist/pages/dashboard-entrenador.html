@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Entrenador - Fit Power</title>
+    <link rel="icon" type="image/png" href="../assets/logos/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css?v=20261014">
+</head>
+<body class="socio-app">
+    <div class="socio-shell">
+
+        <!-- ===== Menú lateral ===== -->
+        <aside class="socio-sidebar">
+            <div class="socio-brand">
+                <img src="../assets/logos/logo.png" alt="Fit Power">
+                <small>Panel del entrenador</small>
+            </div>
+            <nav class="socio-nav">
+                <button class="active" data-view="socios"><span>01</span> Mis socios</button>
+                <button data-view="rutinas"><span>02</span> Rutinas</button>
+            </nav>
+            <button class="socio-logout" id="logout">Cerrar sesión</button>
+        </aside>
+
+        <!-- ===== Contenido principal ===== -->
+        <main class="socio-main">
+
+            <!-- ===== Encabezado del panel ===== -->
+            <header class="socio-topbar">
+                <div>
+                    <div class="socio-kicker">Seguimiento deportivo</div>
+                    <h1>Panel del entrenador</h1>
+                </div>
+                <div class="socio-avatar">EN</div>
+            </header>
+
+            <!-- ===== Sección Socios ===== -->
+            <section class="socio-view active" id="view-socios">
+                <div class="socio-card full">
+                    <h2>Programas a mi cargo</h2>
+                    <div id="programas-entrenador" class="routine-list">Cargando...</div>
+                </div>
+                <div class="socio-card full" style="margin-top:18px">
+                    <h2>Mis socios</h2>
+                    <p class="socio-meta">Los que te tienen como entrenador personal y los inscriptos en tus programas.</p>
+                    <div id="socios-entrenador" class="routine-list">Cargando...</div>
+                </div>
+            </section>
+
+            <!-- ===== Sección Rutinas ===== -->
+            <section class="socio-view" id="view-rutinas">
+                <div class="socio-card full">
+                    <h2>Crear rutina</h2>
+                    <form id="rutina-form" class="form-grid">
+                        <div class="field full">
+                            <label>Socio<select id="rutina-socio" name="socio_id" required></select></label>
+                        </div>
+                        <div class="field full">
+                            <label>Programa<select id="rutina-programa" name="programa_id"></select></label>
+                        </div>
+                        <div class="field">
+                            <label>Nombre<input name="nombre" required placeholder="Ej. Fuerza tren superior"></label>
+                        </div>
+                        <div class="field">
+                            <label>Descripción<input name="descripcion" placeholder="Objetivo de la rutina"></label>
+                        </div>
+                        <div id="rutina-ejercicios" class="field full"></div>
+                        <button type="button" id="agregar-ejercicio" class="socio-button secondary">Agregar ejercicio</button>
+                        <button class="socio-button" type="submit">Crear y asignar rutina</button>
+                    </form>
+                </div>
+                <div class="socio-card full" style="margin-top:18px">
+                    <h2>Rutinas guardadas</h2>
+                    <div id="rutinas-entrenador" class="routine-list">Cargando...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== Scripts ===== -->
+    <script src="../js/api.js?v=20261014"></script>
+    <script src="../js/ui.js?v=20261014"></script>
+    <script src="../js/entrenador.js?v=20261014"></script>
+</body>
+</html>

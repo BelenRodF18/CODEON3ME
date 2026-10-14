@@ -56,21 +56,20 @@ const escaparHtml = (valor) => String(valor ?? "").replace(/[&<>'"]/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;"
 }[c]));
 
-// Pide programas o planes a la API pública.
+// Pide programas o planes a la API pública (API.request de api.js).
 async function pedirCatalogo(ruta) {
-    const respuesta = await fetch("/api" + ruta);
-    const datos = await respuesta.json();
-    if (!respuesta.ok) throw new Error(datos.message || "No se pudo cargar la información");
+    const datos = await API.request(ruta);
+    if (datos.status !== "success") throw new Error(datos.message || "No se pudo cargar la información");
     return datos;
 }
 
 // Página de un programa: historia, técnica, beneficios, coach y planes.
 function renderPrograma(cont, programa) {
     const planes = programa.planes.map((plan) =>
-        `<a href="../planes/planes.html?plan=${encodeURIComponent(plan.slug)}" class="verde-titulo">${escaparHtml(plan.nombre)}</a>`
+        `<a href="planes.html?plan=${encodeURIComponent(plan.slug)}" class="verde-titulo">${escaparHtml(plan.nombre)}</a>`
     ).join(" · ");
     const coach = programa.entrenador
-        ? `<img src="../../assets/imagenes/${escaparHtml(programa.entrenador_foto)}" alt="${escaparHtml(programa.entrenador)}" style="width:180px; height:180px; border-radius:50%; object-fit:cover; border: 4px solid #AAFA64; margin-bottom:15px; box-shadow: 0 0 15px rgba(170, 250, 100, 0.3);">
+        ? `<img src="../assets/imagenes/${escaparHtml(programa.entrenador_foto)}" alt="${escaparHtml(programa.entrenador)}" style="width:180px; height:180px; border-radius:50%; object-fit:cover; border: 4px solid #AAFA64; margin-bottom:15px; box-shadow: 0 0 15px rgba(170, 250, 100, 0.3);">
            <h5 class="text-white">Coach a cargo:</h5>
            <h4 class="verde-titulo">${escaparHtml(programa.entrenador)}</h4>`
         : `<h5 class="text-white">Coach a cargo:</h5><h4 class="verde-titulo">Próximamente</h4>`;
@@ -79,7 +78,7 @@ function renderPrograma(cont, programa) {
         <div class="row g-4 align-items-stretch">
             <div class="col-lg-8">
                 <div class="p-4 p-md-5 rounded-4 h-100" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(170,250,100,0.2); min-height: 420px;">
-                    <img src="../../assets/imagenes/${escaparHtml(programa.imagen)}" alt="${escaparHtml(programa.nombre)}" class="img-fluid rounded-4 mb-4" style="width:100%; height:260px; object-fit:cover;">
+                    <img src="../assets/imagenes/${escaparHtml(programa.imagen)}" alt="${escaparHtml(programa.nombre)}" class="img-fluid rounded-4 mb-4" style="width:100%; height:260px; object-fit:cover;">
                     <h1 class="titulos text-uppercase mb-3">${escaparHtml(programa.nombre)}</h1>
                     <h3 class="verde-titulo">Historia</h3><p>${escaparHtml(programa.historia)}</p>
                     <h3 class="verde-titulo">Técnica</h3><p>${escaparHtml(programa.tecnica)}</p>
@@ -100,7 +99,7 @@ function renderPlan(cont, plan) {
     const estilo = presentacionPlanes[plan.slug] || { color: "#AAFA64", detalles: [] };
     const precio = "$" + Number(plan.precio).toLocaleString("es-UY");
     const programas = plan.programas.map((programa) =>
-        `<li class="mb-2"><a href="../programas/programas.html?programa=${encodeURIComponent(programa.slug)}" class="text-white">${escaparHtml(programa.nombre)}</a>
+        `<li class="mb-2"><a href="programas.html?programa=${encodeURIComponent(programa.slug)}" class="text-white">${escaparHtml(programa.nombre)}</a>
          <span class="text-white-50"> · ${escaparHtml(programa.entrenador || "coach por asignar")}</span></li>`
     ).join("");
 
@@ -136,20 +135,18 @@ function renderPlan(cont, plan) {
 // Si el usuario ya inició sesión, el botón "Iniciar Sesión" pasa a ser
 // "Mi panel" y lleva a su dashboard, así puede volver sin loguearse de nuevo.
 async function mostrarAccesoAlPanel() {
-    try {
-        const respuesta = await fetch("/api/sesion");
-        if (!respuesta.ok) return;
-        const { usuario } = await respuesta.json();
-        if (!usuario) return;
-        const carpeta = { admin: "admin", entrenador: "entrenador", socio: "socio", personal: "personal", recepcion: "recepcion" }[usuario.rol];
-        if (!carpeta) return;
+    // Sin API o sin sesión se deja "Iniciar Sesión".
+    const sesion = await API.request("/sesion");
+    if (sesion.status !== "success" || !sesion.usuario) return;
+    const usuario = sesion.usuario;
+    const panel = { admin: "admin", entrenador: "entrenador", socio: "socio", personal: "personal", recepcion: "recepcion" }[usuario.rol];
+    if (!panel) return;
 
-        document.querySelectorAll('a[href$="formularios/login.html"]').forEach((enlace) => {
-            enlace.href = enlace.getAttribute("href").replace("formularios/login.html", `dashboard/${carpeta}/dashboard-${carpeta}.html`);
-            enlace.textContent = "Mi panel";
-            enlace.title = "Sesión de " + usuario.nombre;
-        });
-    } catch (error) { /* sin API: se deja "Iniciar Sesión" */ }
+    document.querySelectorAll('a[href$="login.html"]').forEach((enlace) => {
+        enlace.href = enlace.getAttribute("href").replace("login.html", `dashboard-${panel}.html`);
+        enlace.textContent = "Mi panel";
+        enlace.title = "Sesión de " + usuario.nombre;
+    });
 }
 
 // --- Lógica Principal ---

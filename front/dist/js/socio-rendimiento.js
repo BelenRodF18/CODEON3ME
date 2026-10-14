@@ -26,14 +26,11 @@
             const datos = Object.fromEntries(new FormData(formulario));
 
             try {
-                await api('/socio/series/' + serie.id, {
-                    method: 'PUT',
-                    body: {
-                        peso: datos.peso,
-                        repeticiones: datos.repeticiones,
-                        descanso_segundos: serie.descanso_segundos,
-                        sensacion: datos.sensacion
-                    }
+                await api('/socio/series/' + serie.id, 'PUT', {
+                    peso: datos.peso,
+                    repeticiones: datos.repeticiones,
+                    descanso_segundos: serie.descanso_segundos,
+                    sensacion: datos.sensacion
                 });
                 exito('Serie actualizada', 'Tu historial ya refleja el cambio.');
                 recargar();
@@ -58,7 +55,7 @@
         if (!confirmado) return;
 
         try {
-            await api('/socio/series/' + serie.id, { method: 'DELETE' });
+            await api('/socio/series/' + serie.id, 'DELETE');
             exito('Registro eliminado', 'La serie ya no figura en tu historial.');
             recargar();
         } catch (fallo) {

@@ -12,8 +12,8 @@
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@500;700&amp;family=Syne:wght@700;800&amp;display=swap" rel="stylesheet"/>
 
-    <link rel="stylesheet" href="dist/css/estilos.css?v=20260918"> <link rel="stylesheet" href="dist/css/mobile.css?v=20260918"> </head>
-<body>
+    <link rel="stylesheet" href="dist/css/style.css?v=20261014"> <link rel="stylesheet" href="dist/css/mobile.css?v=20261014"> </head>
+<body class="sitio">
 
     <!-- ===== Encabezado y menú de navegación ===== -->
     <header>
@@ -31,11 +31,11 @@
                 <li><a href="#Planes" class="link" onclick="cambiarActivo(this)">Planes</a></li>
                 <li><a href="#Staff" class="link" onclick="cambiarActivo(this)">Staff</a></li>
                 <li><a href="#NuestraHistoria" class="link" onclick="cambiarActivo(this)">Nuestra Historia</a></li>
-                <li class="solo-movil"><a href="dist/pages/formularios/login.html" class="link link-login">Iniciar Sesión</a></li>
+                <li class="solo-movil"><a href="dist/pages/login.html" class="link link-login">Iniciar Sesión</a></li>
             </ul>
 
             <div class="iconos-nav">
-                <a href="dist/pages/formularios/login.html" class="btn-negro-link menu-pc">Iniciar Sesión</a>
+                <a href="dist/pages/login.html" class="btn-negro-link menu-pc">Iniciar Sesión</a>
             </div> 
         </nav> 
     </header>
@@ -54,7 +54,7 @@
                     <h2 class="subtitulo">Despierta tu potencial. Tu mejor versión te espera. Comienza tu viaje hoy.</h2>
                 
                     <div class="botones-hero">
-                        <a href="dist/pages/hero/masinformacion.html" class="btn-degradado-ancho">Conocer más</a>
+                        <a href="dist/pages/masinformacion.html" class="btn-degradado-ancho">Conocer más</a>
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                         <img src="dist/assets/imagenes/boxeo.jpg" alt="Boxeo" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">BOXEO</h3>
-                            <a href="dist/pages/programas/programas.html?programa=boxeo" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=boxeo" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
 
@@ -80,7 +80,7 @@
                         <img src="dist/assets/imagenes/musculacion.jpg" alt="Musculación" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">MUSCULACIÓN</h3>
-                            <a href="dist/pages/programas/programas.html?programa=musculacion" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=musculacion" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
 
@@ -88,7 +88,7 @@
                         <img src="dist/assets/imagenes/crosstrainning.jpg" alt="Cross Training" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">CROSS TRAINING</h3>
-                            <a href="dist/pages/programas/programas.html?programa=cross" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=cross" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
 
@@ -96,7 +96,7 @@
                         <img src="dist/assets/imagenes/spinning.jpg" alt="Spinning" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">SPINNING</h3>
-                            <a href="dist/pages/programas/programas.html?programa=spinning" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=spinning" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
 
@@ -104,7 +104,7 @@
                         <img src="dist/assets/imagenes/yoga.jpg" alt="Yoga" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">YOGA</h3>
-                            <a href="dist/pages/programas/programas.html?programa=yoga" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=yoga" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
 
@@ -112,7 +112,7 @@
                         <img src="dist/assets/imagenes/pilates.jpg" alt="Pilates" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">PILATES</h3>
-                            <a href="dist/pages/programas/programas.html?programa=pilates" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=pilates" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
 
@@ -120,7 +120,7 @@
                         <img src="dist/assets/imagenes/EntranamientoFuncional.jpg" alt="Entreno Funcional" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">ENTRENO FUNCIONAL</h3>
-                            <a href="dist/pages/programas/programas.html?programa=funcional" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=funcional" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
 
@@ -128,7 +128,7 @@
                         <img src="dist/assets/imagenes/natacion.jpg" alt="Natación" class="tarjeta-img">
                         <div class="tarjeta-info">
                             <h3 class="tarjeta-titulo">NATACIÓN</h3>
-                            <a href="dist/pages/programas/programas.html?programa=natacion" class="btn-saber-mas">Saber más →</a>
+                            <a href="dist/pages/programas.html?programa=natacion" class="btn-saber-mas">Saber más →</a>
                         </div>
                     </div>
                 </div>
@@ -153,7 +153,7 @@
                                 <li>- Ver todas las rutinas</li>
                                 <li>- Disponibilidad a soporte técnico</li>
                             </ul>
-                            <a href="dist/pages/planes/planes.html?plan=basico">
+                            <a href="dist/pages/planes.html?plan=basico">
                                 <button class="btn-elegir-plan">Conocer plan</button>
                             </a>
                         </div>
@@ -167,7 +167,7 @@
                                 <li>- Ajustes de rutinas por personal trainer</li>
                                 <li>- Acceso a nutricionista</li>
                             </ul>
-                            <a href="dist/pages/planes/planes.html?plan=pro">
+                            <a href="dist/pages/planes.html?plan=pro">
                                 <button class="btn-elegir-plan">Conocer plan</button>
                             </a>
                         </div>
@@ -180,7 +180,7 @@
                                 <li>- Personalizar tus propias rutinas y cambios</li>
                                 <li>- Acceso a coach y soporte técnico</li>
                             </ul>
-                            <a href="dist/pages/planes/planes.html?plan=elite">
+                            <a href="dist/pages/planes.html?plan=elite">
                                 <button class="btn-elegir-plan">Conocer plan</button>
                             </a>
                         </div>
@@ -275,7 +275,7 @@
                         de lograr tus metas.
                     </p>
                     <span class="subtitulo-historia">¡Te esperamos!</span>
-                    <a href="dist/pages/historia/nuestrahistoria.html" class="btn-saber-mas-historia">Saber más →</a>
+                    <a href="dist/pages/nuestrahistoria.html" class="btn-saber-mas-historia">Saber más →</a>
                 </div>
             </div>
                 </div>
@@ -303,16 +303,16 @@
             <div class="footer-columna">
                 <h3 class="footer-nav-titulo">Servicios</h3>
                 <ul class="footer-enlaces">
-                    <li><a href="dist/pages/servicios/servicios.html">Nuestros Servicios</a></li>
+                    <li><a href="dist/pages/servicios.html">Nuestros Servicios</a></li>
                 </ul>
             </div>
 
             <div class="footer-columna">
                 <h3 class="footer-nav-titulo">Textos Legales</h3>
                 <ul class="footer-enlaces">
-                    <li><a href="dist/pages/legal/politica-privacidad.html">Política de privacidad</a></li>
-                    <li><a href="dist/pages/legal/politica-cookies.html">Política de cookies</a></li>
-                    <li><a href="dist/pages/legal/aviso-legal.html">Aviso legal</a></li>
+                    <li><a href="dist/pages/politica-privacidad.html">Política de privacidad</a></li>
+                    <li><a href="dist/pages/politica-cookies.html">Política de cookies</a></li>
+                    <li><a href="dist/pages/aviso-legal.html">Aviso legal</a></li>
                 </ul>
             </div>
         </div>
@@ -325,5 +325,6 @@
 
     <!-- ===== Scripts ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="dist/js/script.js?v=20260918"></script> </body>
+    <script src="dist/js/api.js?v=20261014"></script>
+    <script src="dist/js/script.js?v=20261014"></script> </body>
 </html>

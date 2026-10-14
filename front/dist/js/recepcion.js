@@ -111,9 +111,13 @@
         fijarEstado('Validando código...', 'proceso');
 
         try {
-            // Un ingreso rechazado llega con 200 (permitido = false); solo un
-            // problema de sesión o un token vacío lanza error.
-            const datos = await api('/recepcion/accesos/canjear', { method: 'POST', body: { token } });
+            // Un ingreso rechazado llega con status 'error' pero trae "permitido";
+            // sin ese dato fue un problema de sesión, de conexión o un token vacío.
+            const datos = await API.request('/recepcion/accesos/canjear', 'POST', { token });
+            if (datos.permitido === undefined) {
+                await window.FP.revisarSesion();
+                throw new Error(datos.message || 'No se pudo completar la operación');
+            }
 
             mostrarResultado(datos);
 
@@ -269,7 +273,7 @@
             if (!boton) return;
 
             try {
-                const datos = await api('/recepcion/accesos/' + boton.dataset.id + '/salida', { method: 'POST' });
+                const datos = await api('/recepcion/accesos/' + boton.dataset.id + '/salida', 'POST');
                 exito('Salida registrada', datos.socio.nombre + ' se retiró a las ' + datos.acceso.hora + '.');
                 await cargarHistorial();
             } catch (fallo) {

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Personal - FitPower</title>
+    <link rel="icon" type="image/png" href="../assets/logos/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css?v=20261014">
+</head>
+<body class="socio-app">
+    <div class="socio-shell">
+
+        <!-- ===== Menú lateral ===== -->
+        <aside class="socio-sidebar">
+            <div class="socio-brand">
+                <img src="../assets/logos/logo.png" alt="Fit Power">
+                <small>Personal de mantenimiento</small>
+            </div>
+            <nav class="socio-nav">
+                <button class="active" data-view="mantenimiento"><span>01</span> Mantenimiento</button>
+            </nav>
+            <button class="socio-logout" id="logout">Cerrar sesión</button>
+        </aside>
+
+        <!-- ===== Contenido principal ===== -->
+        <main class="socio-main">
+
+            <!-- ===== Encabezado del panel ===== -->
+            <header class="socio-topbar">
+                <div>
+                    <div class="socio-kicker">Operación del gimnasio</div>
+                    <h1>Panel de mantenimiento</h1>
+                </div>
+                <div class="socio-avatar">PM</div>
+            </header>
+
+            <!-- ===== Sección Contactar al equipo / Mantenimiento ===== -->
+            <section class="socio-view active" id="view-mantenimiento">
+                <div class="socio-section">
+                    <h2>Reportes de máquinas</h2>
+                    <p class="socio-meta">Solo se muestran reportes de mantenimiento. Las sugerencias son privadas del administrador.</p>
+                </div>
+                <button id="refresh" class="socio-button" style="margin:20px 0">Actualizar reportes</button>
+                <div id="reports" class="report-list">Cargando...</div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== Scripts ===== -->
+    <script src="../js/api.js?v=20261014"></script>
+    <script src="../js/ui.js?v=20261014"></script>
+    <script src="../js/personal.js?v=20261014"></script>
+</body>
+</html>

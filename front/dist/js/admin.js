@@ -212,7 +212,7 @@
             if (!usuarioValido(formulario, datos)) return false;
 
             try {
-                const respuesta = await api('/admin/usuarios', { method: 'POST', body: datos });
+                const respuesta = await api('/admin/usuarios', 'POST', datos);
                 await recargarUsuarios([respuesta.usuario.id]);
                 exito('Usuario creado correctamente', respuesta.usuario.nombre + ' ya está disponible en el sistema.');
                 return true;
@@ -236,7 +236,7 @@
             if (!datos.password) delete datos.password;
 
             try {
-                const respuesta = await api('/admin/usuarios/' + usuario.id, { method: 'PUT', body: datos });
+                const respuesta = await api('/admin/usuarios/' + usuario.id, 'PUT', datos);
                 await recargarUsuarios([usuario.id]);
                 exito('Usuario actualizado', 'Se guardaron los datos de ' + respuesta.usuario.nombre + '.');
                 return true;
@@ -262,10 +262,7 @@
         if (!confirmado) return;
 
         try {
-            const respuesta = await api('/admin/usuarios/' + usuario.id + '/estado', {
-                method: 'PUT',
-                body: { activo: activar }
-            });
+            const respuesta = await api('/admin/usuarios/' + usuario.id + '/estado', 'PUT', { activo: activar });
             await recargarUsuarios([usuario.id]);
             exito(
                 activar ? 'Usuario habilitado' : 'Usuario dado de baja',
@@ -349,7 +346,7 @@
                 if (forzar && !forzar.checked) return false;
 
                 try {
-                    await api('/admin/usuarios/' + usuario.id + (forzar ? '?forzar=1' : ''), { method: 'DELETE' });
+                    await api('/admin/usuarios/' + usuario.id + (forzar ? '?forzar=1' : ''), 'DELETE');
                     return true;
                 } catch (fallo) {
                     errorToast('No se pudo eliminar', fallo.message);
@@ -540,22 +537,13 @@
         await conCarga(boton, async () => {
             try {
                 // El plan va primero: define qué entrenador y qué programas se permiten.
-                await api('/admin/socios/' + id + '/membresia', {
-                    method: 'PUT',
-                    body: {
-                        plan_id: valor('.admin-plan'),
-                        vencimiento: valor('.admin-date'),
-                        estado: valor('.admin-status')
-                    }
+                await api('/admin/socios/' + id + '/membresia', 'PUT', {
+                    plan_id: valor('.admin-plan'),
+                    vencimiento: valor('.admin-date'),
+                    estado: valor('.admin-status')
                 });
-                await api('/admin/socios/' + id + '/entrenador', {
-                    method: 'PUT',
-                    body: { entrenador_id: valor('.admin-trainer') }
-                });
-                await api('/admin/socios/' + id + '/programas', {
-                    method: 'PUT',
-                    body: { programas }
-                });
+                await api('/admin/socios/' + id + '/entrenador', 'PUT', { entrenador_id: valor('.admin-trainer') });
+                await api('/admin/socios/' + id + '/programas', 'PUT', { programas });
                 await cargarTodo();
                 exito('Socio actualizado', 'Se guardaron el plan, el entrenador y los programas.');
             } catch (fallo) {
@@ -571,10 +559,7 @@
 
         await conCarga(boton, async () => {
             try {
-                await api('/admin/programas/' + id + '/entrenador', {
-                    method: 'PUT',
-                    body: { entrenador_id: entrenador }
-                });
+                await api('/admin/programas/' + id + '/entrenador', 'PUT', { entrenador_id: entrenador });
                 await cargarTodo();
                 exito('Programa actualizado', 'El entrenador a cargo quedó guardado.');
             } catch (fallo) {
@@ -703,10 +688,7 @@
 
             await conCarga(formulario.querySelector('button[type="submit"]'), async () => {
                 try {
-                    await api('/admin/ejercicios', {
-                        method: 'POST',
-                        body: Object.fromEntries(new FormData(formulario))
-                    });
+                    await api('/admin/ejercicios', 'POST', Object.fromEntries(new FormData(formulario)));
                     formulario.reset();
                     await cargarTodo();
                     exito('Ejercicio agregado', 'Ya está disponible para armar rutinas.');
@@ -724,10 +706,7 @@
 
             const entrada = formulario.querySelector('input');
             try {
-                await api('/admin/conversaciones/' + formulario.dataset.id + '/mensajes', {
-                    method: 'POST',
-                    body: { mensaje: entrada.value }
-                });
+                await api('/admin/conversaciones/' + formulario.dataset.id + '/mensajes', 'POST', { mensaje: entrada.value });
                 entrada.value = '';
                 await cargarConversaciones();
                 exito('Respuesta enviada', 'El socio ya puede verla en su portal.');
@@ -742,10 +721,7 @@
             if (!boton) return;
 
             try {
-                await api('/admin/conversaciones/' + boton.dataset.id + '/estado', {
-                    method: 'PUT',
-                    body: { estado: boton.dataset.state }
-                });
+                await api('/admin/conversaciones/' + boton.dataset.id + '/estado', 'PUT', { estado: boton.dataset.state });
                 await cargarConversaciones();
                 exito('Estado actualizado', 'La conversación pasó a "' + ESTADOS_CONVERSACION[boton.dataset.state] + '".');
             } catch (fallo) {

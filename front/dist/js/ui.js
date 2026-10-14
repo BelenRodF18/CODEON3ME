@@ -13,8 +13,8 @@
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
     }[caracter]));
 
-    // Todos los dashboards viven en dist/pages/dashboard/<rol>/.
-    const URL_LOGIN = '../../formularios/login.html';
+    // Todos los dashboards viven en dist/pages/, junto al login.
+    const URL_LOGIN = 'login.html';
 
     /** Roles que acepta la página abierta (los fija exigirSesion). */
     let rolesPagina = null;
@@ -25,57 +25,30 @@
     }
 
     /**
-     * La API respondió 401/403 con la página abierta: si la sesión venció o en
+     * La API respondió con error estando en un panel: si la sesión venció o en
      * este navegador se entró con otra cuenta, se vuelve al login.
      */
-    async function revisarSesion(estado) {
+    async function revisarSesion() {
         if (!rolesPagina) return;
-        if (estado === 401) {
+        const sesion = await API.request('/me');
+        if (sesion.status === 'success') {
+            if (!rolesPagina.includes(sesion.usuario.rol)) irAlLogin('otra_cuenta');
+        } else if (sesion.message !== 'No se pudo conectar con la API') {
             irAlLogin('expirada');
-            return;
         }
-        try {
-            const respuesta = await fetch('/api/me', { credentials: 'same-origin' });
-            const datos = await respuesta.json();
-            if (!respuesta.ok) irAlLogin('expirada');
-            else if (!rolesPagina.includes(datos.usuario.rol)) irAlLogin('otra_cuenta');
-        } catch (error) { /* sin conexión: se muestra el error normal */ }
     }
 
     /**
-     * Llamada a la API. Devuelve el JSON; si la respuesta no es OK lanza un
-     * Error con el mensaje del backend y los datos extra (campo, dependencias).
+     * Llamada a la API con API.request (api.js). Devuelve el JSON; si el
+     * backend responde status 'error' lanza un Error con el mensaje y los
+     * datos extra (campo, dependencias), así cada panel lo atrapa con try/catch.
      */
-    async function api(ruta, opciones = {}) {
-        const config = { credentials: 'same-origin', ...opciones };
+    async function api(endpoint, method = 'GET', data = null) {
+        const datos = await API.request(endpoint, method, data);
 
-        if (config.body && !(config.body instanceof FormData)) {
-            config.headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
-            if (typeof config.body !== 'string') {
-                config.body = JSON.stringify(config.body);
-            }
-        }
-
-        let respuesta;
-        try {
-            respuesta = await fetch('/api' + ruta, config);
-        } catch (error) {
-            const fallo = new Error('No se pudo conectar con el servidor');
-            fallo.sinConexion = true;
-            throw fallo;
-        }
-
-        let datos = {};
-        try {
-            datos = await respuesta.json();
-        } catch (error) {
-            datos = {};
-        }
-
-        if (!respuesta.ok) {
-            if (respuesta.status === 401 || respuesta.status === 403) await revisarSesion(respuesta.status);
+        if (datos.status === 'error') {
+            await revisarSesion();
             const fallo = new Error(datos.message || 'No se pudo completar la operación');
-            fallo.estado = respuesta.status;
             fallo.datos = datos;
             throw fallo;
         }
@@ -332,8 +305,8 @@
     /** Cierra la sesión en el servidor y vuelve a la página principal del sitio. */
     async function cerrarSesion() {
         rolesPagina = null;
-        await api('/logout', { method: 'POST' }).catch(() => {});
-        window.location.replace('../../../../index.html');
+        await API.request('/logout', 'POST');
+        window.location.replace('../../index.html');
     }
 
     global.FP = {
@@ -341,6 +314,6 @@
         toast, exito, error, aviso, info,
         modal, confirmar,
         badge, vacio, cargando, conCarga,
-        exigirSesion, cerrarSesion
+        exigirSesion, cerrarSesion, revisarSesion
     };
 })(window);

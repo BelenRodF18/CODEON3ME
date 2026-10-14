@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal del socio | Fit Power</title>
+    <link rel="icon" type="image/png" href="../assets/logos/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css?v=20261014">
+</head>
+<body class="socio-app">
+    <div class="socio-shell">
+
+        <!-- ===== Menú lateral ===== -->
+        <aside class="socio-sidebar">
+            <div class="socio-brand"><img src="../assets/logos/logo.png" alt="Fit Power"><small>Portal del socio</small></div>
+            <nav class="socio-nav" aria-label="Secciones del portal">
+                <button class="active" data-view="inicio"><span>01</span> Inicio</button>
+                <button data-view="rutinas"><span>02</span> Mis rutinas</button>
+                <button data-view="acceso"><span>03</span> Mi acceso</button>
+                <button data-view="rendimiento"><span>04</span> Rendimiento</button>
+                <button data-view="mantenimiento"><span>05</span> Contactar al equipo <b class="nav-badge" id="avisos-badge" hidden></b></button>
+            </nav>
+            <button class="socio-logout" id="cerrar-sesion">Cerrar sesión</button>
+        </aside>
+
+        <!-- ===== Contenido principal ===== -->
+        <main class="socio-main">
+
+            <!-- ===== Encabezado del panel ===== -->
+            <header class="socio-topbar">
+                <div><div class="socio-kicker">Tu espacio de entrenamiento</div><h1 id="saludo">Hola, socio</h1></div>
+                <div class="socio-avatar" id="avatar">SP</div>
+            </header>
+
+            <!-- ===== Sección Inicio ===== -->
+            <section class="socio-view active" id="view-inicio">
+                <div class="socio-grid">
+                    <article class="socio-card wide"><div class="socio-status"><div><h3>Estado de tu membresía</h3><div id="membresia-plan" class="socio-meta">Cargando plan...</div><div id="membresia-fecha" class="socio-date">--</div></div><span id="membresia-estado" class="status-pill ok">Consultando</span></div><p id="membresia-mensaje" class="socio-meta"></p></article>
+                    <article class="socio-card"><h3>Afluencia ahora</h3><div id="aforo" class="socio-date">--</div><p>Personas dentro del gimnasio en este momento.</p><button class="socio-button secondary" data-go="acceso">Ver mi QR</button></article>
+                    <article class="socio-card full aviso-card" id="avisos-card" hidden><div class="socio-status"><div><h3>Novedades de tus reportes</h3><p>El equipo respondió o cambió el estado de lo que reportaste.</p></div><button class="socio-button" data-go="mantenimiento">Ver conversaciones</button></div><div id="avisos-list" class="report-list"></div></article>
+                    <article class="socio-card full"><div class="socio-status"><div><h3>Mis programas</h3><p>Los programas de tu plan en los que estás inscripto y quién los dirige.</p></div></div><div id="home-programas" class="routine-list"></div></article>
+                    <article class="socio-card full"><div class="socio-status"><div><h3>Tus rutinas</h3><p>Lo que te dejaron listo tus entrenadores.</p></div><button class="socio-button" data-go="rutinas">Abrir rutinas</button></div><div id="home-rutinas" class="routine-list"></div></article>
+                </div>
+            </section>
+
+            <!-- ===== Sección Rutinas ===== -->
+            <section class="socio-view" id="view-rutinas">
+                <div class="socio-section"><div class="socio-kicker">Entrenamiento</div><h2>Mis rutinas</h2><p class="socio-meta">Selecciona una rutina para ver los ejercicios, series y descansos.</p></div>
+                <article class="socio-card full workout-clock">
+                    <div class="socio-status"><div><h3>Cronómetro de entrenamiento</h3><p>Úsalo para medir una serie o tu descanso entre ejercicios.</p></div><span id="workout-timer-state" class="tag">Listo</span></div>
+                    <strong id="workout-timer-value" class="workout-timer-value">00:00</strong>
+                    <div class="workout-timer-controls">
+                        <label class="timer-duration">Minutos <input id="workout-minutes" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="1" autocomplete="off"></label>
+                        <label class="timer-duration">Segundos <input id="workout-seconds" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="30" autocomplete="off"></label>
+                        <button id="workout-start" class="socio-button" type="button">Iniciar</button>
+                        <button id="workout-pause" class="socio-button secondary" type="button">Pausar</button>
+                        <button id="workout-reset" class="socio-button secondary" type="button">Reiniciar</button>
+                    </div>
+                </article>
+                <div id="rutinas-list" class="routine-list" style="margin-top:20px"></div>
+            </section>
+
+            <!-- ===== Sección Mi acceso (QR) ===== -->
+            <section class="socio-view" id="view-acceso">
+                <div class="socio-section"><div class="socio-kicker">Entrada rápida</div><h2>Mi acceso</h2><p class="socio-meta">Tu código se renueva cada minuto y solo puede utilizarse una vez.</p></div>
+                <article class="socio-card full" style="margin-top:20px"><div class="qr-layout"><div><div id="qr-code" class="qr-box"><span style="color:#111">Generando...</span></div><div id="qr-countdown" class="qr-count">--</div></div><div><h3>Listo para entrenar</h3><p>Presenta este código en el molinete. El sistema comprueba tu membresía antes de habilitar la entrada.</p><button id="refresh-qr" class="socio-button" style="margin-top:18px">Generar nuevo código</button><p id="qr-message" class="socio-meta" style="margin-top:13px"></p></div></div></article>
+            </section>
+
+            <!-- ===== Sección Rendimiento ===== -->
+            <section class="socio-view" id="view-rendimiento">
+                <div class="socio-section"><div class="socio-kicker">Progreso real</div><h2>Rendimiento</h2><p class="socio-meta">Registra tus series y construye tu historial de fuerza.</p></div>
+                <article class="socio-card full" style="margin-top:20px"><h3>Mis récords personales</h3><p class="socio-meta">La mejor carga de cada ejercicio. Se actualiza al registrar, editar o borrar una serie.</p><div id="records-list" class="records-grid"></div></article>
+                <div class="socio-grid" style="margin-top:20px"><article class="socio-card wide"><h3>Historial de series</h3><div id="series-list"></div></article><article class="socio-card"><h3>Registrar serie</h3><form id="serie-form" class="form-grid"><div class="field full"><label for="serie-ejercicio">Ejercicio</label><select id="serie-ejercicio" required></select></div><div class="field"><label for="serie-peso">Peso (kg)</label><input id="serie-peso" type="number" min="0" step="0.5" required></div><div class="field"><label for="serie-reps">Repeticiones</label><input id="serie-reps" type="number" min="1" required></div><div class="field"><label for="serie-descanso">Descanso (seg)</label><input id="serie-descanso" type="number" min="10" max="600" value="90" required></div><div class="field full"><label for="serie-sensacion">Sensación</label><input id="serie-sensacion" placeholder="Fácil, intensa, al límite..."></div><button class="socio-button full" type="submit">Guardar y comenzar descanso</button></form><div id="timer" class="timer" hidden><span>Descanso</span><strong id="timer-value">01:30</strong><button id="stop-timer" class="socio-button secondary">Detener</button></div></article></div>
+            </section>
+
+            <!-- ===== Sección Contactar al equipo / Mantenimiento ===== -->
+            <section class="socio-view" id="view-mantenimiento">
+                <div class="socio-section"><div class="socio-kicker">Comunicación directa</div><h2>Contactar al equipo</h2><p class="socio-meta">Reporta un problema de la sala o envía una sugerencia al administrador.</p></div>
+                <div class="socio-grid" style="margin-top:20px"><article class="socio-card"><h3>Nueva conversación</h3><form id="reporte-form" class="form-grid"><div class="field full"><label for="reporte-tipo">Tipo de mensaje</label><select id="reporte-tipo"><option value="mantenimiento">Reportar problema de máquina</option><option value="sugerencia">Enviar sugerencia al administrador</option></select></div><div class="field full"><label for="reporte-etiqueta">Asunto</label><select id="reporte-etiqueta"><option>Polea rota</option><option>Máquina sucia</option><option>Pantalla apagada</option><option>Idea para mejorar el gimnasio</option><option>Otro</option></select></div><div class="field full"><label for="reporte-descripcion">Descripción</label><textarea id="reporte-descripcion" required placeholder="Cuéntanos qué ocurre o qué propones"></textarea></div><div class="field full" id="foto-field"><label for="reporte-foto">Foto (opcional para problemas)</label><input id="reporte-foto" type="file" accept="image/jpeg,image/png,image/webp"></div><button class="socio-button full" type="submit" id="reporte-submit">Enviar conversación</button></form></article><article class="socio-card wide"><h3>Mis conversaciones</h3><div id="reportes-list" class="report-list"></div></article></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== Aviso breve ===== -->
+    <div id="toast" class="toast" role="status"></div>
+
+    <!-- ===== Scripts ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="../js/api.js?v=20261014"></script>
+    <script src="../js/ui.js?v=20261014"></script>
+    <script src="../js/socio-rendimiento.js?v=20261014"></script>
+    <script src="../js/socio.js?v=20261014"></script>
+</body>
+</html>
