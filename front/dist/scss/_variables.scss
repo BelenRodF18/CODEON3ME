@@ -1,0 +1,17 @@
+// Variables de colores, degradado y fuentes.
+
+// Colores
+$blanco: #FFFFFF;
+$negro: #000000;
+$menta: #64FAB5;
+$lima: #AAFA64;
+$cian: #46ECF4;
+$verde: #5DF64A;
+
+// Degradado de los botones
+$degradado: linear-gradient(135deg, $cian, $verde);
+
+// Fuentes
+$fuente-titulos: 'Syne', sans-serif;
+$fuente-texto: 'Inter', sans-serif;
+$fuente-secundaria: 'Space Grotesk', sans-serif;

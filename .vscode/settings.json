@@ -1,0 +1,12 @@
+{
+    "liveSassCompile.settings.includeItems": ["/front/dist/scss/style.scss"],
+    "liveSassCompile.settings.formats": [
+        {
+            "format": "expanded",
+            "extensionName": ".css",
+            "savePath": "/front/dist/css"
+        }
+    ],
+    "liveSassCompile.settings.generateMap": false,
+    "liveSassCompile.settings.autoprefix": false
+}
