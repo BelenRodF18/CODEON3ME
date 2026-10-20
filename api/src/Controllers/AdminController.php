@@ -228,7 +228,8 @@ class AdminController extends BaseController {
         $estado = $datos['estado'] ?? 'Al dia';
         $vencimiento = trim((string) ($datos['vencimiento'] ?? ''));
 
-        if ($vencimiento === '') {
+        // "Al dia" con una fecha ya pasada dejaría la membresía vencida: se lleva al fin de mes.
+        if ($vencimiento === '' || ($estado === 'Al dia' && $vencimiento < date('Y-m-d'))) {
             $vencimiento = date('Y-m-t');
         }
 
