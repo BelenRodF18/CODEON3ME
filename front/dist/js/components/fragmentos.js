@@ -19,7 +19,7 @@ const cargando = (filas = 4) =>
     '<div class="fp-skeleton" aria-busy="true" aria-label="Cargando">' +
     '<div class="fp-skeleton-fila"></div>'.repeat(filas) + '</div>';
 
-// Marca un botón como ocupado mientras se guarda.
+// Deja un botón marcado como "guardando" hasta que termine la tarea.
 async function conCarga(boton, tarea) {
     if (boton) boton.dataset.cargando = '1';
     try {

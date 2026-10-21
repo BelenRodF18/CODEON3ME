@@ -5,7 +5,7 @@ use App\Utils\QrToken;
 
 /**
  * Canje de QR en Recepción: registra ingresos y salidas.
- * Mostrar un QR no escribe en MySQL; el token se guarda recién al escanearlo.
+ * Mostrar un QR no guarda nada en la base; el código se guarda recién cuando se escanea.
  * Si el socio ya está adentro, el siguiente QR registra su salida.
  */
 class AccesoModel {
@@ -22,7 +22,7 @@ class AccesoModel {
         $this->db = $db;
     }
 
-    /** Semilla con la que se firman los QR del socio (la crea la primera vez). */
+    /** Número secreto propio de cada socio con el que se firman sus QR (se crea la primera vez). */
     public function semilla(int $idUsuario): ?string {
         $stmt = $this->db->prepare('SELECT Token_semilla FROM Usuarios WHERE ID_usuario = :id');
         $stmt->execute(['id' => $idUsuario]);
@@ -43,7 +43,7 @@ class AccesoModel {
         return $nueva;
     }
 
-    /** Datos del usuario dueño del token. */
+    /** Datos del usuario al que pertenece el QR. */
     private function socioDelToken(int $idUsuario): ?array {
         $sql = 'SELECT u.ID_usuario AS id,
                        u.Activo AS activo,
@@ -79,7 +79,7 @@ class AccesoModel {
         return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
     }
 
-    /** Indica si ese QR ya se usó. */
+    /** Indica si ese QR ya fue usado antes. */
     private function tokenYaCanjeado(string $huella): bool {
         $stmt = $this->db->prepare('SELECT 1 FROM Tokens_QR WHERE Token_hash = :hash LIMIT 1');
         $stmt->execute(['hash' => $huella]);
@@ -87,7 +87,7 @@ class AccesoModel {
         return (bool) $stmt->fetchColumn();
     }
 
-    /** Indica si el socio ingresó hace menos de 45 segundos (doble escaneo). */
+    /** Indica si el socio ingresó hace menos de 45 segundos (escaneo repetido por error). */
     private function ingresoReciente(int $idUsuario): bool {
         $sql = "SELECT 1
                 FROM Registro_Accesos
@@ -185,7 +185,7 @@ class AccesoModel {
         ];
     }
 
-    /** Valida el QR (firma, vencimiento, uso, socio, membresía) y registra el ingreso o la salida. */
+    /** Revisa el QR (firma, vencimiento, si ya se usó, socio y membresía) y registra el ingreso o la salida. */
     public function canjear(string $token, ?int $idRecepcion): array {
         $partes = QrToken::partes($token);
         if ($partes === null) {
@@ -291,7 +291,7 @@ class AccesoModel {
         ];
     }
 
-    /** Guarda el token usado y cierra el ingreso abierto con la hora de salida. */
+    /** Guarda el QR usado y cierra el ingreso abierto con la hora de salida. */
     private function registrarSalida(array $socio, array $partes, string $huella, int $idAcceso, ?int $idRecepcion): array {
         $this->db->beginTransaction();
 

@@ -1,4 +1,4 @@
-// Cliente HTTP: todas las páginas hablan con la API a través de API.request.
+// Todas las páginas piden y envían datos a la API con API.request.
 
 const API = {
     // En Docker o Laragon
@@ -12,7 +12,7 @@ const API = {
             headers: { 'Content-Type': 'application/json' }
         };
 
-        // GET no lleva body. POST/PUT sí.
+        // Las consultas (GET) no envían datos; guardar o editar (POST/PUT) sí.
         if (data instanceof FormData) {
             // Formulario con archivos (foto del reporte).
             delete opciones.headers;

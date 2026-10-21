@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-/** Base de los controladores: respuestas JSON, lectura del body y control de sesión por rol. */
+/** Base de los controladores: arma las respuestas, lee los datos enviados y revisa que haya sesión con el rol correcto. */
 abstract class BaseController {
     protected $db;
 
@@ -12,7 +12,7 @@ abstract class BaseController {
         \App\Utils\Sesion::iniciar();
     }
 
-    /** Responde con JSON y el código HTTP indicado. */
+    /** Responde en formato JSON con el código de estado indicado (200 = bien, 400/401/403 = error). */
     protected function json(array $datos, int $estado = 200): void {
         http_response_code($estado);
         echo json_encode($datos, JSON_UNESCAPED_UNICODE);
@@ -28,7 +28,7 @@ abstract class BaseController {
         $this->json(array_merge(['status' => 'success'], $datos), $estado);
     }
 
-    /** Devuelve el cuerpo JSON de la petición como array (vacío si no hay). */
+    /** Devuelve los datos que mandó el navegador en una lista (vacía si no mandó nada). */
     protected function body(): array {
         $crudo = file_get_contents('php://input');
         $datos = json_decode((string) $crudo, true);
@@ -36,7 +36,7 @@ abstract class BaseController {
         return is_array($datos) ? $datos : [];
     }
 
-    /** Exige sesión con alguno de los roles; devuelve el ID del usuario o null (ya respondió 401/403). */
+    /** Exige que haya sesión con alguno de los roles; devuelve el ID del usuario o null (en ese caso ya respondió el error). */
     protected function exigirRol(array $roles): ?int {
         if (empty($_SESSION['usuario_id'])) {
             $this->error('Se requiere iniciar sesión', 401);

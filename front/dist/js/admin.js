@@ -5,7 +5,6 @@
 (function () {
     'use strict';
 
-
     const $ = (id) => document.getElementById(id);
 
     const estado = {

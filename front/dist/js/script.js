@@ -26,7 +26,7 @@ function moverSlider(indiceBloque) {
     const riel = document.getElementById("riel-profesionales");
     if (!riel) return;
     riel.style.transform = `translateX(${indiceBloque * -33.3333}%)`;
-    
+
     const puntos = document.querySelectorAll(".punto-nav");
     puntos.forEach(punto => punto.classList.remove("activo"));
     if (puntos[indiceBloque]) puntos[indiceBloque].classList.add("activo");

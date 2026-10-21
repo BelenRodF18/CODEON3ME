@@ -16,7 +16,7 @@ function cerrarModal(resultado) {
     resolver(resultado);
 }
 
-// Teclado: Escape cierra y Tab no sale del modal.
+// Teclado: Escape cierra la ventana y Tab no sale de ella.
 function alPresionarTecla(evento) {
     if (!modalAbierto) return;
 
@@ -26,7 +26,7 @@ function alPresionarTecla(evento) {
         return;
     }
 
-    // Atrapar el tabulador dentro del modal.
+    // Con Tab el cursor se queda dentro de la ventana y no se escapa a la página de atrás.
     if (evento.key === 'Tab') {
         const focales = modalAbierto.backdrop.querySelectorAll(
             'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [href]'

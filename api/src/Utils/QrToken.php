@@ -2,23 +2,23 @@
 namespace App\Utils;
 
 /**
- * Códigos QR firmados (HMAC-SHA256) que se generan sin escribir en la base.
- * Formato: FP1.<id_usuario>.<expira_unix>.<nonce>.<firma>
+ * Códigos QR con firma de seguridad: nadie puede inventarlos ni modificarlos, y no se guardan en la base al crearlos.
+ * Formato: FP1.<id_usuario>.<vencimiento>.<número_al_azar>.<firma>
  */
 class QrToken {
-    /** Versión del formato del token. */
+    /** Versión del formato del código. */
     public const PREFIJO = 'FP1';
 
-    /** Segundos que dura cada QR antes de renovarse. */
+    /** Segundos que dura cada QR antes de cambiar por uno nuevo. */
     public const VIGENCIA_SEGUNDOS = 60;
 
-    /** Tolerancia de reloj entre el celular del socio y el servidor. */
+    /** Margen en segundos por si el reloj del celular y el del servidor no están clavados. */
     private const MARGEN_RELOJ = 10;
 
-    /** Caracteres de la firma que se guardan en el token. */
+    /** Cantidad de caracteres de la firma que se incluyen en el código. */
     private const LARGO_FIRMA = 32;
 
-    /** Secreto de la aplicación: QR_SECRET del .env o uno generado en api/config/.qr_secret. */
+    /** Clave secreta de la aplicación: viene de QR_SECRET en el .env o se crea sola en api/config/.qr_secret. */
     public static function secretoApp(): string {
         $secreto = (string) (getenv('QR_SECRET') ?: '');
         if (strlen($secreto) >= 32) {
@@ -40,17 +40,17 @@ class QrToken {
         return $nuevo;
     }
 
-    /** Clave de firma: mezcla el secreto de la app con la semilla del socio. */
+    /** Clave para firmar: combina la clave secreta de la app con la semilla propia de cada socio. */
     private static function clave(int $idUsuario, ?string $semilla): string {
         return hash_hmac('sha256', 'qr|' . $idUsuario . '|' . (string) $semilla, self::secretoApp(), true);
     }
 
-    /** Firma el cuerpo del token con la clave del socio. */
+    /** Calcula la firma del código con la clave del socio. */
     private static function firmar(string $cuerpo, int $idUsuario, ?string $semilla): string {
         return substr(hash_hmac('sha256', $cuerpo, self::clave($idUsuario, $semilla)), 0, self::LARGO_FIRMA);
     }
 
-    /** Genera un QR nuevo para el socio; devuelve el token y cuándo vence. */
+    /** Crea un QR nuevo para el socio; devuelve el código y cuándo vence. */
     public static function generar(int $idUsuario, ?string $semilla, ?int $ahora = null): array {
         $ahora = $ahora ?? time();
         $expira = $ahora + self::VIGENCIA_SEGUNDOS;
@@ -66,7 +66,7 @@ class QrToken {
         ];
     }
 
-    /** Separa el token en sus partes; null si el formato es inválido. */
+    /** Separa el código en sus partes; null si el formato no es válido. */
     public static function partes(string $token): ?array {
         $token = trim($token);
         if ($token === '' || strlen($token) > 200) {
@@ -99,21 +99,21 @@ class QrToken {
         ];
     }
 
-    /** Comprueba que la firma corresponda al socio (token no alterado). */
+    /** Comprueba que la firma sea del socio (el código no fue modificado). */
     public static function firmaValida(array $partes, ?string $semilla): bool {
         $esperada = self::firmar($partes['cuerpo'], $partes['usuario_id'], $semilla);
 
         return hash_equals($esperada, $partes['firma']);
     }
 
-    /** Indica si el token todavía no venció. */
+    /** Indica si el código todavía no venció. */
     public static function vigente(array $partes, ?int $ahora = null): bool {
         $ahora = $ahora ?? time();
 
         return $partes['expira'] + self::MARGEN_RELOJ >= $ahora;
     }
 
-    /** Hash del token que se guarda en Tokens_QR para impedir reutilizarlo. */
+    /** Versión cifrada del código; se guarda en Tokens_QR para que no se pueda usar dos veces. */
     public static function huella(string $token): string {
         return hash('sha256', trim($token));
     }

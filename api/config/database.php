@@ -1,5 +1,5 @@
 <?php
-/** Conexión a MySQL con PDO; las credenciales vienen del .env. */
+/** Conexión a MySQL; el usuario y la contraseña se leen del archivo .env. */
 class Database {
     private $host;
     private $port;
@@ -8,9 +8,8 @@ class Database {
     private $password;
     public $conn;
 
-    /** Lee host, puerto, base, usuario y contraseña de las variables de entorno. */
+    /** Lee servidor, puerto, nombre de la base, usuario y contraseña del archivo .env. */
     public function __construct() {
-        // Leemos las variables cargadas desde el .env
         $this->host = getenv('DB_HOST') ?: 'localhost';
         $this->port = getenv('DB_PORT') ?: '3306';
         $this->db_name = getenv('DB_NAME');
@@ -18,7 +17,7 @@ class Database {
         $this->password = getenv('DB_PASS');
     }
 
-    /** Abre la conexión PDO (utf8mb4, errores como excepciones) y la devuelve. */
+    /** Abre la conexión (con tildes y emojis bien guardados, y los errores avisan en vez de callarse) y la devuelve. */
     public function getConnection() {
         $this->conn = null;
         try {

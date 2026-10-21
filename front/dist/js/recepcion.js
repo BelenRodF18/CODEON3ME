@@ -6,7 +6,6 @@
 (function () {
     'use strict';
 
-
     const $ = (id) => document.getElementById(id);
 
     const estado = {
@@ -18,7 +17,7 @@
         ultimoMomento: 0
     };
 
-    // Evita leer dos veces el mismo QR.
+    // Para no leer dos veces seguidas el mismo QR.
     const ES_REPETIDO = (token) => token === estado.ultimoToken && Date.now() - estado.ultimoMomento < 3000;
 
     // ------------------------------------------------------- Estado visual
@@ -79,7 +78,7 @@
         if (navigator.vibrate) navigator.vibrate(respuesta.permitido ? 120 : [90, 70, 90]);
     };
 
-    // Tono corto con WebAudio.
+    // Sonido corto de aviso.
     const pitar = (correcto) => {
         try {
             const Audio = window.AudioContext || window.webkitAudioContext;
@@ -170,7 +169,7 @@
                     if (ES_REPETIDO(texto) || estado.procesando) return;
                     canjear(texto.trim(), 'camara');
                 },
-                () => { /* cada frame sin QR entra acá: se ignora a propósito */ }
+                () => { /* mientras no hay un QR frente a la cámara no se hace nada */ }
             );
 
             estado.escaneando = true;

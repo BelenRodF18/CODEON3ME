@@ -44,7 +44,7 @@ class ProgramaModel {
         return array_map([$this, 'normalizarPrograma'], $filas);
     }
 
-    /** Un programa por su slug, con los planes que lo incluyen. */
+    /** Un programa por su nombre en la dirección (ej. boxeo), con los planes que lo incluyen. */
     public function programaPorSlug(string $slug): ?array {
         $stmt = $this->db->prepare(self::SQL_PROGRAMA . ' WHERE pr.Activo = 1 AND pr.Slug = :slug');
         $stmt->execute(['slug' => $slug]);
@@ -91,7 +91,7 @@ class ProgramaModel {
         }, $filas);
     }
 
-    /** Un plan por su slug, con el detalle de sus programas. */
+    /** Un plan por su nombre en la dirección (ej. pro), con el detalle de sus programas. */
     public function planPorSlug(string $slug): ?array {
         foreach ($this->planes() as $plan) {
             if ($plan['slug'] !== $slug) {
@@ -109,7 +109,6 @@ class ProgramaModel {
 
         return null;
     }
-
 
     /** Indica si el usuario es un entrenador activo. */
     public function esEntrenadorActivo(int $usuarioId): bool {

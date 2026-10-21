@@ -18,7 +18,7 @@ class CatalogoController extends BaseController {
         $this->exito(['programas' => $this->catalogo->programas()]);
     }
 
-    /** GET /programas/:slug: un programa con su coach y los planes que lo incluyen. */
+    /** GET /programas/:nombre: un programa con su coach y los planes que lo incluyen. */
     public function programa($slug) {
         $programa = $this->catalogo->programaPorSlug((string) $slug);
         if (!$programa) {
@@ -33,7 +33,7 @@ class CatalogoController extends BaseController {
         $this->exito(['planes' => $this->catalogo->planes()]);
     }
 
-    /** GET /planes/:slug: un plan con el detalle de sus programas. */
+    /** GET /planes/:nombre: un plan con el detalle de sus programas. */
     public function plan($slug) {
         $plan = $this->catalogo->planPorSlug((string) $slug);
         if (!$plan) {

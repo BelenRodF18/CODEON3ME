@@ -5,8 +5,10 @@ namespace App\Models;
 class UsuarioModel {
     /** Nombre de usuario: minúsculas y números, con . _ - entre medio (ej. juan.diaz). */
     public const FORMATO_USUARIO = '/^[a-z0-9]+([._-][a-z0-9]+)*$/';
+
     /** Largo mínimo del nombre de usuario. */
     public const LARGO_MIN_USUARIO = 3;
+
     /** Largo máximo del nombre de usuario. */
     public const LARGO_MAX_USUARIO = 30;
 
@@ -72,7 +74,7 @@ class UsuarioModel {
         return $fila ? $this->normalizar($fila) : null;
     }
 
-    /** Convierte los tipos de una fila (IDs a número, activo a booleano). */
+    /** Ajusta los datos de una fila (los IDs a número, activo a verdadero/falso). */
     private function normalizar(array $fila): array {
         $fila['id'] = (int) $fila['id'];
         $fila['rol_id'] = (int) $fila['rol_id'];
@@ -97,7 +99,7 @@ class UsuarioModel {
         return (bool) $stmt->fetchColumn();
     }
 
-    /** Crea la cuenta y su persona en una transacción; guarda la contraseña con hash. */
+    /** Crea la cuenta y sus datos personales juntos (si algo falla no queda nada a medias); la contraseña se guarda cifrada. */
     public function crear(string $nombre, string $nombreUsuario, string $password, int $rolId): int {
         $this->db->beginTransaction();
 
@@ -170,7 +172,7 @@ class UsuarioModel {
         }
     }
 
-    /** Baja o alta lógica: nunca borra la fila. */
+    /** Da de baja o habilita al usuario sin borrarlo de la base. */
     public function cambiarEstado(int $id, bool $activo): void {
         $stmt = $this->db->prepare('UPDATE Usuarios SET Activo = :activo WHERE ID_usuario = :id');
         $stmt->execute(['activo' => $activo ? 1 : 0, 'id' => $id]);
@@ -216,7 +218,7 @@ class UsuarioModel {
         return $dependencias['socios_asignados'] > 0 || $dependencias['rutinas_creadas'] > 0;
     }
 
-    /** Borrado definitivo: limpia lo que las claves foráneas no borran solas. */
+    /** Borrado definitivo: también elimina lo que depende del usuario y la base no borra sola. */
     public function eliminar(int $id): void {
         $this->db->beginTransaction();
 

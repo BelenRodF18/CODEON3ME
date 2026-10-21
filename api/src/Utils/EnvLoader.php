@@ -1,16 +1,16 @@
 <?php
 namespace App\Utils;
 
-/** Lee el archivo .env y carga sus variables en el entorno de PHP. */
+/** Lee el archivo .env (configuración secreta) y deja sus valores disponibles para el resto del código. */
 class EnvLoader {
-    /** Carga cada CLAVE=valor del archivo sin pisar variables que ya existan. */
+    /** Carga cada línea CLAVE=valor del archivo, sin reemplazar las que ya estaban definidas. */
     public static function load($path) {
         if (!file_exists($path)) return;
 
         $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         foreach ($lines as $line) {
             $line = trim($line);
-            // Ignorar comentarios y líneas vacías (tras trim)
+            // Se saltean los comentarios y las líneas vacías
             if ($line === '' || strpos($line, '#') === 0) continue;
 
             $parts = explode('=', $line, 2);
@@ -18,7 +18,7 @@ class EnvLoader {
 
             $name = trim($parts[0]);
             $value = trim($parts[1]);
-            // BOM UTF-8 en la primera clave del archivo
+            // Algunos editores agregan un carácter invisible al inicio del archivo: se quita
             $name = preg_replace('/^\xEF\xBB\xBF/', '', $name);
             if ($name === '') continue;
 

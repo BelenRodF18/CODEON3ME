@@ -1,6 +1,6 @@
 <?php
 /**
- * Carga automática de clases: App\Controllers\AuthController => src/Controllers/AuthController.php.
+ * Carga cada clase sola cuando se usa: App\Controllers\AuthController se busca en src/Controllers/AuthController.php.
  */
 
 spl_autoload_register(function ($class) {

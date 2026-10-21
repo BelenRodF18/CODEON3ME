@@ -1,7 +1,7 @@
 <?php
 /**
- * Instalador de la base sin Docker: php api/config/setup.php [--reset-passwords]
- * Ejecuta init.sql (idempotente) y verifica que existan las cuentas sembradas.
+ * Instala la base de datos sin Docker: php api/config/setup.php [--reset-passwords]
+ * Ejecuta init.sql (se puede correr varias veces sin romper nada) y revisa que existan las cuentas de ejemplo.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -27,7 +27,7 @@ function salida(string $mensaje): void {
     echo $mensaje . PHP_EOL;
 }
 
-/** Parte el script SQL en sentencias, respetando comillas y comentarios. */
+/** Separa el archivo SQL en instrucciones sueltas, sin cortar textos entre comillas ni comentarios. */
 function dividirSql(string $sql): array {
     $sentencias = [];
     $actual = '';

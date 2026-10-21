@@ -3,7 +3,7 @@
 const ICONOS = { exito: '✓', error: '✕', aviso: '!', info: 'i' };
 let pilaToasts = null;
 
-// Contenedor donde se apilan los avisos.
+// Lugar de la pantalla donde se apilan los avisos.
 function contenedorToasts() {
     if (!pilaToasts || !document.body.contains(pilaToasts)) {
         pilaToasts = document.createElement('div');

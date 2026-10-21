@@ -12,7 +12,6 @@ if (PHP_SAPI !== 'cli') {
 require_once __DIR__ . '/../autoload.php';
 \App\Utils\EnvLoader::load(__DIR__ . '/../.env');
 
-
 $GLOBALS['fp_tests'] = [];
 $GLOBALS['fp_resultados'] = ['ok' => 0, 'fallos' => [], 'salteados' => []];
 
@@ -73,7 +72,6 @@ function conexionPruebas(): ?PDO {
 
     return $pdo;
 }
-
 
 /** Carga todas las pruebas de la carpeta. */
 foreach (glob(__DIR__ . '/*Test.php') as $archivo) {

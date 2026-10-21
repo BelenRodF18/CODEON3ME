@@ -175,7 +175,6 @@ class AdminController extends BaseController {
         ];
     }
 
-
     /** Indica si el usuario existe y tiene rol Socio. */
     private function esSocio(int $id): bool {
         $usuario = $this->usuarios->buscar($id);
@@ -303,7 +302,6 @@ class AdminController extends BaseController {
 
         $this->exito(['message' => 'Programas actualizados']);
     }
-
 
     /** PUT /admin/programas/:id/entrenador: cambia el entrenador a cargo del programa. */
     public function asignarEntrenadorPrograma($id) {

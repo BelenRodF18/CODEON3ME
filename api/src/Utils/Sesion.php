@@ -2,23 +2,23 @@
 namespace App\Utils;
 
 /**
- * Configuración única de la sesión de PHP para toda la API.
+ * Configuración de la sesión (el "estás conectado") que comparte toda la API.
  * Todos los controladores la abren con Sesion::iniciar().
  */
 class Sesion {
-    /** Tiempo sin actividad (en segundos) antes de que la sesión venza: 8 horas. */
+    /** Segundos sin actividad antes de cerrar la sesión sola: 8 horas. */
     public const DURACION_INACTIVIDAD = 28800;
 
-    /** Nombre de la cookie de sesión. */
+    /** Nombre con el que el navegador guarda la sesión. */
     public const NOMBRE = 'FITPOWERSESSID';
 
-    /** Abre la sesión si todavía no está abierta, con cookie segura y 8 h de vida. */
+    /** Abre la sesión si todavía no está abierta; dura 8 horas y la cookie se guarda de forma segura. */
     public static function iniciar(): void {
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
 
-        // Por defecto PHP borra las sesiones inactivas a los 24 minutos.
+        // Normalmente PHP cierra las sesiones inactivas a los 24 minutos; acá se alarga.
         ini_set('session.gc_maxlifetime', (string) self::DURACION_INACTIVIDAD);
         session_name(self::NOMBRE);
         session_set_cookie_params([

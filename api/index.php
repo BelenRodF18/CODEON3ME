@@ -1,15 +1,15 @@
 <?php
 /**
- * Punto de entrada de la API (Front Controller).
- * Carga el .env, abre la conexión a MySQL y deja que el router atienda la petición.
- * Toda respuesta sale en JSON.
+ * Puerta de entrada de la API: todas las peticiones pasan por este archivo.
+ * Lee la configuración (.env), se conecta a la base de datos y le pasa el pedido al router.
+ * Siempre responde en formato JSON.
  */
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-ob_start(); 
+ob_start();
 
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
@@ -52,6 +52,6 @@ $router = new \App\Utils\Router($base, $db);
 
 require_once 'routes.php';
 
-$basura = ob_get_clean(); 
+$basura = ob_get_clean();
 
 $router->run();

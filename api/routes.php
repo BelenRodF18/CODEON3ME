@@ -1,7 +1,7 @@
 <?php
 /**
- * Rutas de la API: método HTTP + URL => Controlador@método.
- * Los parámetros como :id o :slug llegan como argumentos al método.
+ * Lista de rutas de la API: tipo de pedido (GET, POST...) + dirección => Controlador@función.
+ * Lo que va con dos puntos (:id, :slug) cambia en cada pedido y llega como dato a la función.
  */
 
 $router->get('/estado', 'EstadoController@ver');
