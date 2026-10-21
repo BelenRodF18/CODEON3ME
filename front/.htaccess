@@ -1,9 +1,2 @@
-<IfModule mod_rewrite.c> 
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# Redirige cualquier petición no encontrada al index del HTML
-RewriteRule ^(.*)$ index.html [QSA,L]
-
-</IfModule>
+# Si una dirección no existe se muestra la página 404 del sitio
+ErrorDocument 404 /front/dist/pages/404.html

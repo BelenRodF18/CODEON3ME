@@ -22,7 +22,13 @@
 </IfModule>
 
 # ====================================================
-# 3. CACHÉ DEL NAVEGADOR
+# 3. PÁGINA 404
+# ====================================================
+# Si una dirección no existe se muestra la página de error del sitio.
+ErrorDocument 404 /front/dist/pages/404.html
+
+# ====================================================
+# 4. CACHÉ DEL NAVEGADOR
 # ====================================================
 # HTML, JS y CSS se revalidan en cada visita (responde 304 si no cambiaron),
 # así una página nueva nunca queda mezclada con un script viejo.
