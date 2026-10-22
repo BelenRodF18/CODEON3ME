@@ -102,6 +102,12 @@ class EntrenadorController {
             return $this->json(['status' => 'error', 'message' => 'Socio, nombre y al menos un ejercicio son obligatorios'], 400);
         }
 
+        foreach ($ejercicios as $ejercicio) {
+            if ((int) ($ejercicio['id'] ?? 0) < 1) {
+                return $this->json(['status' => 'error', 'message' => 'Elegí ejercicios válidos del catálogo'], 400);
+            }
+        }
+
         $vinculo = null;
         foreach ($this->sociosDe($entrenador) as $candidato) {
             if ($candidato['id'] === $socio) {
