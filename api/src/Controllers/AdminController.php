@@ -222,6 +222,10 @@ class AdminController extends BaseController {
     public function actualizarMembresia($id) {
         if (!$this->autorizado()) return;
 
+        if (!$this->esSocio((int) $id)) {
+            return $this->error('Socio no encontrado', 404);
+        }
+
         $datos = $this->body();
         $plan = (int) ($datos['plan_id'] ?? 0);
         $estado = $datos['estado'] ?? 'Al dia';
