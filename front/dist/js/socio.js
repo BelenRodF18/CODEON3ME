@@ -29,12 +29,12 @@ document.querySelectorAll('[data-go]').forEach((button) => button.addEventListen
 const formatDate = (value) => value ? new Date(value + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }) : '--';
 
 // Tarjeta de una rutina con sus ejercicios.
-const renderRoutine = (routine) => `<div class="routine-item"><div class="routine-head"><strong>${routine.nombre}</strong><small>${routine.programa || 'Entrenamiento personal'} · ${routine.entrenador || 'Equipo Fit Power'}</small></div><p class="socio-meta">${routine.descripcion || 'Rutina personalizada para ti.'}</p><div class="exercise-list">${(routine.ejercicios || []).map((exercise) =>
-    `<div class="exercise-row"><span>${exercise.nombre}</span><span>${exercise.series} x ${exercise.repeticiones} · ${exercise.descanso_segundos}s</span></div>`
+const renderRoutine = (routine) => `<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(routine.nombre)}</strong><small>${escapeHtml(routine.programa || 'Entrenamiento personal')} · ${escapeHtml(routine.entrenador || 'Equipo Fit Power')}</small></div><p class="socio-meta">${escapeHtml(routine.descripcion || 'Rutina personalizada para ti.')}</p><div class="exercise-list">${(routine.ejercicios || []).map((exercise) =>
+    `<div class="exercise-row"><span>${escapeHtml(exercise.nombre)}</span><span>${escapeHtml(exercise.series)} x ${escapeHtml(exercise.repeticiones)} · ${escapeHtml(exercise.descanso_segundos)}s</span></div>`
 ).join('') || '<div class="empty">Tu entrenador aún está cargando los ejercicios.</div>'}</div></div>`;
 
 // Tarjeta de un programa con su coach.
-const renderProgram = (program) => `<div class="routine-item" style="cursor:default"><div class="routine-head" style="align-items:center">${program.entrenador_foto ? `<img src="../assets/imagenes/${program.entrenador_foto}" alt="" style="width:42px;height:42px;border-radius:50%;object-fit:cover;margin-right:12px">` : ''}<div style="flex:1"><strong>${program.nombre}</strong><p class="socio-meta" style="margin:2px 0 0">Coach: ${program.entrenador || 'por asignar'}</p></div><a class="socio-button secondary" href="programas.html?programa=${program.slug}">Ver programa</a></div></div>`;
+const renderProgram = (program) => `<div class="routine-item" style="cursor:default"><div class="routine-head" style="align-items:center">${program.entrenador_foto ? `<img src="../assets/imagenes/${escapeHtml(program.entrenador_foto)}" alt="" style="width:42px;height:42px;border-radius:50%;object-fit:cover;margin-right:12px">` : ''}<div style="flex:1"><strong>${escapeHtml(program.nombre)}</strong><p class="socio-meta" style="margin:2px 0 0">Coach: ${escapeHtml(program.entrenador || 'por asignar')}</p></div><a class="socio-button secondary" href="programas.html?programa=${encodeURIComponent(program.slug)}">Ver programa</a></div></div>`;
 
 // Abrir o cerrar una rutina al tocarla.
 const bindRoutineToggle = () => document.querySelectorAll('.routine-item').forEach((item) => item.addEventListener('click', () => item.classList.toggle('open')));
@@ -126,14 +126,14 @@ const loadPerformance = async () => {
     const data = await API.request('/socio/rendimiento');
     if (data.status === 'error') throw new Error(data.message);
     const chosen = $('serie-ejercicio').value;
-    $('serie-ejercicio').innerHTML = data.ejercicios.map((exercise) => `<option value="${exercise.id}">${exercise.nombre}</option>`).join('');
+    $('serie-ejercicio').innerHTML = data.ejercicios.map((exercise) => `<option value="${escapeHtml(exercise.id)}">${escapeHtml(exercise.nombre)}</option>`).join('');
     if (data.ejercicios.some((exercise) => String(exercise.id) === chosen)) $('serie-ejercicio').value = chosen;
     $('records-list').innerHTML = data.records.length
-        ? data.records.map((record) => `<div class="record-item"><span>${record.ejercicio}</span><strong>${Number(record.peso)} kg</strong><small>${record.repeticiones} reps · ${record.fecha} · ${record.series} ${record.series === 1 ? 'serie' : 'series'} registradas</small></div>`).join('')
+        ? data.records.map((record) => `<div class="record-item"><span>${escapeHtml(record.ejercicio)}</span><strong>${Number(record.peso)} kg</strong><small>${escapeHtml(record.repeticiones)} reps · ${escapeHtml(record.fecha)} · ${escapeHtml(record.series)} ${record.series === 1 ? 'serie' : 'series'} registradas</small></div>`).join('')
         : '<div class="empty">Tus récords aparecen acá cuando registres tu primera serie.</div>';
     $('series-list').innerHTML = data.series.length
         ? '<div class="chart-row"><strong>Ejercicio</strong><strong>Peso</strong><strong>Reps</strong><strong>Fecha</strong></div>' + data.series.map((series) =>
-            `<div class="chart-row" data-series-id="${series.id}"><span>${series.ejercicio}${series.record ? ' <span class="tag ok">Récord</span>' : ''}</span><strong>${Number(series.peso)} kg</strong><span>${series.repeticiones}</span><span>${series.fecha}</span></div>`
+            `<div class="chart-row" data-series-id="${Number(series.id)}"><span>${escapeHtml(series.ejercicio)}${series.record ? ' <span class="tag ok">Récord</span>' : ''}</span><strong>${Number(series.peso)} kg</strong><span>${escapeHtml(series.repeticiones)}</span><span>${escapeHtml(series.fecha)}</span></div>`
           ).join('')
         : '<div class="empty">Registra tu primera serie para comenzar el historial.</div>';
 };
@@ -143,7 +143,7 @@ const loadReports = async () => {
     const data = await API.request('/socio/reportes');
     if (data.status === 'error') throw new Error(data.message);
     $('reportes-list').innerHTML = data.reportes.length
-        ? data.reportes.map((report) => `<div class="report-item"><header><strong>${report.tipo === 'sugerencia' ? 'Sugerencia: ' : ''}${report.etiqueta}${Number(report.sin_leer) ? ` <span class="tag suggestion">${report.sin_leer} ${Number(report.sin_leer) === 1 ? 'novedad' : 'novedades'}</span>` : ''}</strong><span class="tag ${report.tipo === 'sugerencia' ? 'suggestion' : ''} ${report.estado === 'solucionado' ? 'ok' : ''}">${({ abierto: 'Abierto', en_revision: 'En revisión', en_reparacion: 'En reparación', solucionado: 'Solucionado' })[report.estado] || report.estado}</span></header><p>${report.descripcion}</p><small class="socio-meta">${report.creado} · ${report.tipo === 'sugerencia' ? 'Enviada al administrador' : 'Enviada a mantenimiento'}</small><div class="chat-box"><div class="chat-messages" id="chat-${report.id}">Cargando conversación...</div><form class="chat-form" data-report-id="${report.id}" style="display:flex;gap:7px"><input name="mensaje" placeholder="Escribe un mensaje..." required><button class="socio-button" type="submit">Enviar</button></form></div></div>`).join('')
+        ? data.reportes.map((report) => `<div class="report-item"><header><strong>${report.tipo === 'sugerencia' ? 'Sugerencia: ' : ''}${escapeHtml(report.etiqueta)}${Number(report.sin_leer) ? ` <span class="tag suggestion">${Number(report.sin_leer)} ${Number(report.sin_leer) === 1 ? 'novedad' : 'novedades'}</span>` : ''}</strong><span class="tag ${report.tipo === 'sugerencia' ? 'suggestion' : ''} ${report.estado === 'solucionado' ? 'ok' : ''}">${escapeHtml(({ abierto: 'Abierto', en_revision: 'En revisión', en_reparacion: 'En reparación', solucionado: 'Solucionado' })[report.estado] || report.estado)}</span></header><p>${escapeHtml(report.descripcion)}</p><small class="socio-meta">${escapeHtml(report.creado)} · ${report.tipo === 'sugerencia' ? 'Enviada al administrador' : 'Enviada a mantenimiento'}</small><div class="chat-box"><div class="chat-messages" id="chat-${Number(report.id)}">Cargando conversación...</div><form class="chat-form" data-report-id="${Number(report.id)}" style="display:flex;gap:7px"><input name="mensaje" placeholder="Escribe un mensaje..." required><button class="socio-button" type="submit">Enviar</button></form></div></div>`).join('')
         : '<div class="empty">Aún no tienes conversaciones.</div>';
     // Cada chat envía su mensaje.
     document.querySelectorAll('.chat-form').forEach((form) => form.addEventListener('submit', sendMessage));
@@ -156,7 +156,7 @@ const loadMessages = async (report) => {
         const data = await API.request(`/socio/reportes/${report.id}/mensajes`);
         if (data.status === 'error') throw new Error(data.message);
         const box = $('chat-' + report.id);
-        box.innerHTML = data.mensajes.map((message) => `<div class="chat-message"><strong>${message.nombre}:</strong> ${message.mensaje}</div>`).join('');
+        box.innerHTML = data.mensajes.map((message) => `<div class="chat-message"><strong>${escapeHtml(message.nombre)}:</strong> ${escapeHtml(message.mensaje)}</div>`).join('');
         box.scrollTop = box.scrollHeight;
     } catch (error) {}
 };
