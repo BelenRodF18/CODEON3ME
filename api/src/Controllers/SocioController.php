@@ -133,7 +133,7 @@ class SocioController {
         }
 
         $foto = null;
-        if (!empty($_FILES['foto']['tmp_name'])) {
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
             if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK || $_FILES['foto']['size'] > 5242880) {
                 return $this->json(['status' => 'error', 'message' => 'La foto debe pesar menos de 5 MB'], 400);
             }

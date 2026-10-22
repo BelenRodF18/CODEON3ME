@@ -8,3 +8,6 @@ RUN a2enmod rewrite headers \
     && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 WORKDIR /var/www/html
+
+# Las fotos de los reportes pueden pesar hasta 5 MB
+RUN printf 'upload_max_filesize=5M\npost_max_size=8M\n' > /usr/local/etc/php/conf.d/uploads.ini
