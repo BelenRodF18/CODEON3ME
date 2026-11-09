@@ -119,16 +119,18 @@
                     </div>
 
                     <div class="contacto-formulario-wrapper">
-                        <form class="formulario-contacto">
+                        <form class="formulario-contacto" id="form-contacto" novalidate>
                             <div class="fila-inputs">
-                                <input type="text" placeholder="Nombre" class="input-contacto" required>
-                                <input type="text" placeholder="Apellido" class="input-contacto" required>
+                                <input type="text" name="nombre" placeholder="Nombre" class="input-contacto" maxlength="60" required autocomplete="given-name">
+                                <input type="text" name="apellido" placeholder="Apellido" class="input-contacto" maxlength="60" required autocomplete="family-name">
                             </div>
-                            <input type="email" placeholder="Email o Teléfono" class="input-contacto" required>
-                            <textarea placeholder="Mensaje" class="textarea-contacto" rows="5" required></textarea>
+                            <input type="text" name="contacto" placeholder="Email o Teléfono" class="input-contacto" maxlength="150" required autocomplete="email">
+                            <textarea name="mensaje" placeholder="Mensaje" class="textarea-contacto" rows="5" maxlength="2000" required></textarea>
+                            <input type="text" name="sitio_web" class="campo-trampa" tabindex="-1" autocomplete="off" aria-hidden="true">
                             <div class="contenedor-btn-formulario">
-                                <button type="submit" class="btn-enviar-contacto">Enviar comentario</button>
+                                <button type="submit" class="btn-enviar-contacto" id="btn-contacto">Enviar comentario</button>
                             </div>
+                            <p class="contacto-estado" id="contacto-estado" role="status" aria-live="polite"></p>
                         </form>
                     </div>
                 </div>
@@ -202,7 +204,7 @@
     <!-- ===== Scripts ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/api.js?v=20261014"></script>
-    <script src="../js/script.js?v=20261014"></script>
+    <script src="../js/script.js?v=20261109d"></script>
     <script src="../js/i18n.js?v=20261022"></script>
     <script src="../js/i18n-paneles.js?v=20261022"></script>
 </body>

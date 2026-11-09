@@ -21,10 +21,21 @@ function cerrarMenuMovil() {
     }
 }
 
+// Bloque que se está viendo en el carrusel de profesionales.
+let sliderIndice = 0;
+const TOTAL_BLOQUES_SLIDER = 3;
+
+// Flechas del carrusel: -1 va al bloque anterior y 1 al siguiente (da la vuelta al llegar al final).
+function moverSliderFlecha(direccion) {
+    const nuevo = (sliderIndice + direccion + TOTAL_BLOQUES_SLIDER) % TOTAL_BLOQUES_SLIDER;
+    moverSlider(nuevo);
+}
+
 // Mueve el carrusel de profesionales al bloque indicado.
 function moverSlider(indiceBloque) {
     const riel = document.getElementById("riel-profesionales");
     if (!riel) return;
+    sliderIndice = indiceBloque;
     riel.style.transform = `translateX(${indiceBloque * -33.3333}%)`;
 
     const puntos = document.querySelectorAll(".punto-nav");
@@ -198,4 +209,83 @@ document.addEventListener("DOMContentLoaded", function () {
             mostrar('/planes/', 'plan', renderPlan, 'Plan no encontrado.');
         }
     }
+});
+
+
+// --- Formulario de contacto (página "Conocer más") ---
+// Se envía con FormSubmit (formsubmit.co), que reenvía el mensaje al correo del gimnasio.
+// La primera vez FormSubmit manda un correo de activación a esta dirección: hay que confirmarlo.
+const CONTACTO_DESTINO = "belenrodriguezinfo3@gmail.com";
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("form-contacto");
+    if (!form) return;
+
+    const estado = document.getElementById("contacto-estado");
+    const boton = document.getElementById("btn-contacto");
+
+    const mostrar = (texto, clase) => {
+        estado.textContent = texto;
+        estado.className = "contacto-estado" + (clase ? " " + clase : "");
+    };
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const datos = Object.fromEntries(new FormData(form).entries());
+
+        // Campo trampa: una persona real lo deja vacío
+        if (datos.sitio_web) {
+            form.reset();
+            return mostrar("¡Gracias! Te vamos a contactar a la brevedad.", "ok");
+        }
+
+        const nombre = (datos.nombre + " " + datos.apellido).trim();
+        const medio = datos.contacto.trim();
+        const esEmail = /^\S+@\S+\.\S+$/.test(medio);
+        const esTelefono = /^[+\d][\d\s().-]{6,}$/.test(medio);
+
+        if (!datos.nombre.trim() || !datos.apellido.trim()) {
+            return mostrar("Completá tu nombre y apellido.", "error");
+        }
+        if (!esEmail && !esTelefono) {
+            return mostrar("Ingresá un correo o un teléfono válido.", "error");
+        }
+        if (datos.mensaje.trim().length < 5) {
+            return mostrar("Escribí tu mensaje.", "error");
+        }
+
+        boton.disabled = true;
+        mostrar("Enviando...");
+
+        // Si dejó un correo, "Responder" en Gmail le contesta directo a él
+        const cuerpo = {
+            _subject: "Contacto web FitPower: " + nombre,
+            _template: "table",
+            _captcha: "false",
+            Nombre: nombre,
+            Contacto: medio,
+            Mensaje: datos.mensaje.trim()
+        };
+        if (esEmail) cuerpo.email = medio;
+
+        try {
+            const respuesta = await fetch("https://formsubmit.co/ajax/" + CONTACTO_DESTINO, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(cuerpo)
+            });
+            const json = await respuesta.json();
+
+            if (json.success === true || json.success === "true") {
+                form.reset();
+                mostrar("¡Gracias! Te vamos a contactar a la brevedad.", "ok");
+            } else {
+                mostrar("No pudimos enviar tu mensaje. Probá de nuevo más tarde.", "error");
+            }
+        } catch (error) {
+            mostrar("No pudimos enviar tu mensaje. Revisá tu conexión.", "error");
+        } finally {
+            boton.disabled = false;
+        }
+    });
 });
