@@ -6,14 +6,14 @@
     <title>Portal del socio | Fit Power</title>
     <link rel="icon" type="image/png" href="../assets/logos/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css?v=20261114">
+    <link rel="stylesheet" href="../css/style.css?v=20261117">
 </head>
 <body class="socio-app">
     <div class="socio-shell">
 
         <!-- ===== Menú lateral ===== -->
         <aside class="socio-sidebar">
-            <div class="socio-brand"><img src="../assets/logos/logo.png" alt="Fit Power"><small>Portal del socio</small></div>
+            <div class="socio-brand"><a href="../../index.html" class="socio-logo" title="Ir al inicio"><img src="../assets/logos/logo.png" alt="Fit Power"></a><small>Portal del socio</small></div>
             <nav class="socio-nav" aria-label="Secciones del portal">
                 <button class="active" data-view="inicio"><span>01</span> Inicio</button>
                 <button data-view="rutinas"><span>02</span> Mis rutinas</button>
@@ -21,6 +21,7 @@
                 <button data-view="rendimiento"><span>04</span> Rendimiento</button>
                 <button data-view="mantenimiento"><span>05</span> Contactar al equipo <b class="nav-badge" id="avisos-badge" hidden></b></button>
             </nav>
+            <a class="socio-inicio" href="../../index.html">Ir al inicio</a>
             <button class="socio-logout" id="cerrar-sesion">Cerrar sesión</button>
         </aside>
 
@@ -30,7 +31,7 @@
             <!-- ===== Encabezado del panel ===== -->
             <header class="socio-topbar">
                 <div><div class="socio-kicker">Tu espacio de entrenamiento</div><h1 id="saludo">Hola, socio</h1></div>
-                <div class="socio-avatar" id="avatar">SP</div>
+                <button type="button" class="socio-avatar" id="avatar" title="Mi perfil" aria-label="Mi perfil">SP</button>
             </header>
 
             <!-- ===== Sección Inicio ===== -->
@@ -92,9 +93,10 @@
     <script src="../js/components/fragmentos.js?v=20261014"></script>
     <script src="../js/components/alertas.js?v=20261014"></script>
     <script src="../js/components/modal.js?v=20261014"></script>
+    <script src="../js/perfil.js?v=20261115"></script>
     <script src="../js/socio-rendimiento.js?v=20261014"></script>
     <script src="../js/socio.js?v=20261112"></script>
-    <script src="../js/i18n.js?v=20261114"></script>
-    <script src="../js/i18n-paneles.js?v=20261022"></script>
+    <script src="../js/i18n.js?v=20261118"></script>
+    <script src="../js/i18n-paneles.js?v=20261115"></script>
 </body>
 </html>

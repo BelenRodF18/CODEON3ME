@@ -131,7 +131,7 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
     .socio-brand { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 12px; border: 0; } .socio-brand small { margin: 0; }
     .socio-nav { display: flex; overflow-x: auto; margin-top: 0; padding: 2px 0 3px; scrollbar-width: thin; scrollbar-color: #2d3931 transparent; } .socio-nav button { white-space: nowrap; padding: 9px 10px; font-size: 12px; }
     .socio-nav button span { width: auto; margin-right: 4px; } .socio-logout { position: absolute; right: 14px; top: 13px; padding: 8px 10px; font-size: 0; } .socio-logout::after { content: 'Salir'; font-size: 12px; }
-    .socio-main { padding: 24px 15px 45px; } .socio-topbar { margin-bottom: 25px; } .socio-avatar { display: none; }
+    .socio-main { padding: 24px 15px 45px; } .socio-topbar { margin-bottom: 25px; }
     .socio-card, .socio-card.wide { grid-column: 1 / -1; } .form-grid, .qr-layout { grid-template-columns: 1fr; } .qr-box { margin: 0 auto; }
     .chart-row { grid-template-columns: 1fr 1fr; gap: 7px; } .chart-row span:first-child { grid-column: 1 / -1; }
     .rutina-row { grid-template-columns: 1fr 1fr; } .nav-badge { position: static; transform: none; margin-left: 6px; } .rutina-row label:first-child { grid-column: 1 / -1; }
@@ -178,3 +178,39 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
 }
 .rec-manual > * { min-width: 0; max-width: 100%; }
 .rec-topbar .fp-idioma--en-menu { margin-left: auto; }
+
+/* ------------------------------------- Logo, botón de inicio y perfil */
+.socio-logo, .logo a, .auth-logo a { display: inline-block; line-height: 0; }
+.socio-logo:focus-visible, .logo a:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+
+.socio-inicio {
+  margin-top: auto;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid #374138;
+  color: #e5ebe5;
+  border-radius: 9px;
+  padding: 11px;
+  font-weight: 600;
+}
+.socio-inicio:hover { border-color: var(--lime); color: var(--lime); }
+.socio-inicio + .socio-logout { margin-top: 10px; }
+
+button.socio-avatar { border: 0; padding: 0; cursor: pointer; font: inherit; font-weight: 800; }
+button.socio-avatar:hover, button.socio-avatar:focus-visible { box-shadow: 0 0 0 3px rgba(170, 250, 100, 0.35); }
+
+.rec-perfil { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.rec-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+@media (max-width: 900px) {
+  .rec-perfil, .rec-botones { justify-content: center; }
+}
+@media (max-width: 780px) {
+  .socio-avatar { width: 38px; height: 38px; font-size: 13px; }
+  .socio-inicio { position: absolute; right: 70px; top: 13px; padding: 8px 10px; font-size: 0; }
+  .socio-inicio::after { content: "Inicio"; font-size: 12px; }
+  .socio-inicio + .socio-logout { margin-top: 0; }
+}
+@media (min-width: 781px) {
+  .socio-inicio, .socio-logout { font-family: inherit; font-size: 14px; font-weight: 600; }
+}

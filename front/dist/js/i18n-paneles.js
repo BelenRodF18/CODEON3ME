@@ -562,7 +562,24 @@
         "3 minutos": "3 minutes",
         "2 minutos": "2 minutes",
         "30 s fuerte / 30 s suave": "30 s hard / 30 s easy",
-        "Matías Rossi": "Matias Rossi"
+        "Matías Rossi": "Matias Rossi",
+
+        // ---------------- Perfil y botón de inicio ----------------
+        "Mi perfil": "My profile",
+        "Ir al inicio": "Go to home page",
+        "Estos son los datos de tu cuenta.": "These are your account details.",
+        "Teléfono (opcional)": "Phone (optional)",
+        "Contraseña actual": "Current password",
+        "Contraseña nueva": "New password",
+        "Si no querés cambiar la contraseña, dejá esos dos campos vacíos.": "If you don't want to change your password, leave those two fields empty.",
+        "Perfil actualizado": "Profile updated",
+        "Se guardaron tus datos.": "Your details were saved.",
+        "No se pudo abrir el perfil": "The profile could not be opened",
+        "Probá de nuevo en un momento.": "Try again in a moment.",
+        "No se pudo guardar el perfil": "The profile could not be saved",
+        "La contraseña actual no es correcta": "The current password is not correct",
+        "La contraseña nueva debe tener al menos 6 caracteres": "The new password must have at least 6 characters",
+        "Perfil actualizado correctamente": "Profile updated successfully",
     };
 
     // Frases dentro de textos largos.

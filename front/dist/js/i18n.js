@@ -338,24 +338,33 @@
             ".fp-idioma b{color:#AAFA64}" +
             ".fp-idioma--oculto{opacity:0;transform:translateY(16px);pointer-events:none}" +
             "@media (max-width:600px){.fp-idioma{right:12px;bottom:12px;padding:7px 11px;font-size:12px}}" +
-            "@media (min-width:781px){.fp-idioma--lateral{right:auto;left:18px;bottom:84px}}" +
-            ".fp-idioma--en-menu{position:static;box-shadow:none;margin:0;padding:6px 10px;font-size:12px;flex:0 0 auto}";
+            ".fp-idioma--en-menu{position:static;box-shadow:none;margin:0;padding:6px 10px;font-size:12px;flex:0 0 auto}" +
+            ".fp-idioma--en-lado{position:static;box-shadow:none;align-self:flex-start;margin:auto 0 12px;padding:7px 12px;font-size:12px}" +
+            ".fp-idioma--en-lado + .socio-inicio{margin-top:0}";
         document.head.appendChild(estilo);
         boton = document.createElement("button");
         boton.type = "button";
         boton.className = "fp-idioma";
-        // En los paneles con menú lateral queda en el hueco del menú: no tapa contenido.
-        if (document.querySelector(".socio-sidebar")) boton.classList.add("fp-idioma--lateral");
         boton.setAttribute("data-i18n-skip", "");
         boton.addEventListener("click", () => cambiarIdioma(idioma === "es" ? "en" : "es"));
         document.body.appendChild(boton);
-        // En celular, los paneles lo llevan dentro de la cabecera del menú (no flota sobre el contenido).
+        // En los paneles no flota: en escritorio va dentro del menú lateral (arriba de "Ir al inicio")
+        // y en celular dentro de la cabecera. Así nunca queda encima de otro botón.
         const movil = window.matchMedia("(max-width:780px)");
+        const lado = document.querySelector(".socio-sidebar");
         const ubicar = () => {
             const marca = document.querySelector(".socio-sidebar .socio-brand, .rec-topbar");
             if (!marca) return;
-            if (movil.matches) { marca.appendChild(boton); boton.classList.add("fp-idioma--en-menu"); }
-            else { document.body.appendChild(boton); boton.classList.remove("fp-idioma--en-menu"); }
+            boton.classList.remove("fp-idioma--en-menu", "fp-idioma--en-lado");
+            if (movil.matches) {
+                marca.appendChild(boton);
+                boton.classList.add("fp-idioma--en-menu");
+            } else if (lado) {
+                lado.insertBefore(boton, lado.querySelector(".socio-inicio") || lado.querySelector(".socio-logout"));
+                boton.classList.add("fp-idioma--en-lado");
+            } else {
+                document.body.appendChild(boton);
+            }
         };
         ubicar();
         if (movil.addEventListener) movil.addEventListener("change", ubicar);
@@ -364,8 +373,7 @@
         window.addEventListener("scroll", () => {
             const y = window.scrollY;
             const alFinal = window.innerHeight + y >= document.documentElement.scrollHeight - 40;
-            const lateral = boton.classList.contains("fp-idioma--lateral") && window.innerWidth > 780;
-            if (lateral) return;
+            if (boton.classList.contains("fp-idioma--en-lado") || boton.classList.contains("fp-idioma--en-menu")) return;
             if (y > ultimoY + 4 && y > 120 && !alFinal) boton.classList.add("fp-idioma--oculto");
             else if (y < ultimoY - 4 || y <= 120 || alFinal) boton.classList.remove("fp-idioma--oculto");
             ultimoY = y;

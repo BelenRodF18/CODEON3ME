@@ -9,6 +9,8 @@ $router->post('/login', 'AuthController@login');
 $router->post('/logout', 'AuthController@logout');
 $router->get('/me', 'AuthController@me');
 $router->get('/sesion', 'AuthController@sesion');
+$router->get('/perfil', 'PerfilController@ver');
+$router->put('/perfil', 'PerfilController@modificar');
 $router->get('/programas', 'CatalogoController@programas');
 $router->get('/programas/:slug', 'CatalogoController@programa');
 $router->get('/planes', 'CatalogoController@planes');

@@ -20,7 +20,12 @@ Además de lo que pedía la letra, sumamos tres funciones propias:
 2. **QR de acceso que cambia cada minuto:** reemplaza la tarjeta y controla quién entra, quién sale y cuánta gente hay en el gimnasio.
 3. **Récords personales y cronómetro de descanso:** el socio anota sus series, el sistema marca cuándo bate un récord y le avisa cuándo terminó el descanso.
 
-La web está en **español e inglés**: el botón 🌐 ES | EN (abajo a la derecha) cambia el idioma y la página recuerda tu elección.
+La web está en **español e inglés**: el botón 🌐 ES | EN cambia el idioma y la página recuerda tu elección. En los paneles de escritorio está en el menú de la izquierda; en el celular, en la cabecera; en la web pública y en Recepción, abajo a la derecha.
+
+En todos los paneles:
+
+- Tocar el **logo** o el botón **Ir al inicio** vuelve a la página principal sin cerrar la sesión (ahí el botón de arriba pasa a decir «Mi panel»).
+- Tocar el **círculo con las iniciales** (arriba a la derecha) abre **Mi perfil**: se cambian el nombre, el teléfono y la contraseña (hay que escribir la actual). El usuario y el rol los cambia solo el administrador. Usa las rutas `GET /api/perfil` y `PUT /api/perfil`.
 
 ## Cómo ponerlo en marcha
 
