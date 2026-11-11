@@ -1,0 +1,6 @@
+# Bootstrap 5.3.3 (copia local) no cambia nunca: el navegador lo guarda un año.
+<IfModule mod_headers.c>
+    <FilesMatch "\.css$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>

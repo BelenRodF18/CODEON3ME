@@ -37,3 +37,22 @@ ErrorDocument 404 /front/dist/pages/404.html
         Header set Cache-Control "no-cache"
     </FilesMatch>
 </IfModule>
+
+# ====================================================
+# 5. CACHÉ DE IMÁGENES Y FUENTES
+# ====================================================
+# Las imágenes casi no cambian: el navegador las guarda 30 días y no las vuelve a bajar.
+# Si se cambia una foto, hay que cambiarle el nombre o agregarle ?v=número en el HTML.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|gif|svg|webp|ico|woff2?)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
+# ====================================================
+# 6. COMPRESIÓN DE TEXTO
+# ====================================================
+# HTML, CSS, JS y JSON viajan comprimidos (pesan mucho menos por la red).
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json image/svg+xml
+</IfModule>
