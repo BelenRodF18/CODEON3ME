@@ -388,6 +388,12 @@ SET u.Usuario = LOWER(SUBSTRING_INDEX(u.Usuario, '@', 1))
 WHERE u.Usuario LIKE '%@%'
   AND ocupado.Usuario IS NULL;
 
+-- Persona: teléfono de contacto (lo ve el socio en "Mis entrenadores").
+SET @sql = (SELECT IF((SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='Persona' AND COLUMN_NAME='Telefono')=0,
+    'ALTER TABLE Persona ADD COLUMN Telefono VARCHAR(30) NULL', 'DO 0'));
+PREPARE fp_stmt FROM @sql; EXECUTE fp_stmt; DEALLOCATE PREPARE fp_stmt;
+
 -- Persona ya no guarda email.
 SET @sql = (SELECT IF((SELECT COUNT(*) FROM information_schema.COLUMNS
     WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='Persona' AND COLUMN_NAME='Correo')>0,
@@ -459,6 +465,13 @@ INNER JOIN Usuarios u ON u.ID_usuario = p.ID_usuario
 INNER JOIN fp_seed_usuarios s ON s.usuario = u.Usuario
 SET p.Foto = s.foto
 WHERE p.Foto IS NULL AND s.foto IS NOT NULL;
+
+-- Teléfonos de demostración para los entrenadores que todavía no tienen uno (se editan desde el panel del administrador).
+UPDATE Persona p
+INNER JOIN Usuarios u ON u.ID_usuario = p.ID_usuario
+INNER JOIN Tipo_usuario t ON t.ID_tipo = u.ID_tipo
+SET p.Telefono = CONCAT('099 100 ', LPAD(u.ID_usuario, 3, '0'))
+WHERE p.Telefono IS NULL AND t.Nombre = 'Entrenador';
 
 DROP TEMPORARY TABLE fp_seed_usuarios;
 

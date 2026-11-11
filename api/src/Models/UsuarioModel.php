@@ -40,6 +40,7 @@ class UsuarioModel {
     public function listar(): array {
         $sql = 'SELECT u.ID_usuario AS id,
                        p.Nombre AS nombre,
+                       p.Telefono AS telefono,
                        u.Usuario AS nombre_usuario,
                        u.Activo AS activo,
                        u.ID_tipo AS rol_id,
@@ -58,6 +59,7 @@ class UsuarioModel {
     public function buscar(int $id): ?array {
         $sql = 'SELECT u.ID_usuario AS id,
                        p.Nombre AS nombre,
+                       p.Telefono AS telefono,
                        u.Usuario AS nombre_usuario,
                        u.Activo AS activo,
                        u.ID_tipo AS rol_id,
@@ -129,6 +131,13 @@ class UsuarioModel {
             }
             throw $error;
         }
+    }
+
+    /** Guarda el teléfono de contacto (vacío = sin teléfono). */
+    public function guardarTelefono(int $id, ?string $telefono): void {
+        $telefono = $telefono === null ? '' : trim($telefono);
+        $stmt = $this->db->prepare('UPDATE Persona SET Telefono = :telefono WHERE ID_usuario = :id');
+        $stmt->execute(['telefono' => $telefono === '' ? null : $telefono, 'id' => $id]);
     }
 
     /** Edita la cuenta; la contraseña es opcional. Si deja de ser entrenador, sus programas quedan sin entrenador. */

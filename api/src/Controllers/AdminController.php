@@ -134,7 +134,7 @@ class AdminController extends BaseController {
         )->fetchAll(\PDO::FETCH_ASSOC);
 
         $ejercicios = $this->db->query(
-            'SELECT ID_ejercicio AS id, Nombre AS nombre, Grupo_muscular AS grupo_muscular, Activo AS activo
+            'SELECT ID_ejercicio AS id, Nombre AS nombre, Grupo_muscular AS grupo_muscular, Descripcion AS descripcion, Activo AS activo
              FROM Ejercicios ORDER BY Nombre'
         )->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -352,6 +352,64 @@ class AdminController extends BaseController {
         }
     }
 
+    /** PUT /admin/ejercicios/:id: edita nombre, grupo muscular y descripción de un ejercicio. */
+    public function actualizarEjercicio($id) {
+        if (!$this->autorizado()) return;
+
+        $datos = $this->body();
+        $nombre = trim((string) ($datos['nombre'] ?? ''));
+        $grupo = trim((string) ($datos['grupo_muscular'] ?? ''));
+
+        if ($nombre === '' || $grupo === '') {
+            return $this->error('Nombre y grupo muscular son obligatorios');
+        }
+
+        $existe = $this->db->prepare('SELECT 1 FROM Ejercicios WHERE ID_ejercicio = :id');
+        $existe->execute(['id' => (int) $id]);
+        if (!$existe->fetchColumn()) {
+            return $this->error('El ejercicio no existe', 404);
+        }
+
+        try {
+            $stmt = $this->db->prepare('UPDATE Ejercicios SET Nombre = :nombre, Grupo_muscular = :grupo, Descripcion = :descripcion WHERE ID_ejercicio = :id');
+            $stmt->execute([
+                'nombre' => $nombre,
+                'grupo' => $grupo,
+                'descripcion' => trim((string) ($datos['descripcion'] ?? '')),
+                'id' => (int) $id,
+            ]);
+
+            $this->exito(['message' => 'Ejercicio actualizado']);
+        } catch (\PDOException $error) {
+            $this->error('Ya existe otro ejercicio con ese nombre', 409);
+        }
+    }
+
+    /**
+     * PUT /admin/ejercicios/:id/estado: da de baja (activo = false) o reactiva un ejercicio.
+     * No se borra: las rutinas y el rendimiento de los socios que ya lo usan se conservan,
+     * pero deja de aparecer al armar rutinas nuevas.
+     */
+    public function cambiarEstadoEjercicio($id) {
+        if (!$this->autorizado()) return;
+
+        $datos = $this->body();
+        if (!array_key_exists('activo', $datos)) {
+            return $this->error('Falta indicar si el ejercicio queda activo');
+        }
+
+        $stmt = $this->db->prepare('UPDATE Ejercicios SET Activo = :activo WHERE ID_ejercicio = :id');
+        $stmt->execute(['activo' => $datos['activo'] ? 1 : 0, 'id' => (int) $id]);
+
+        $existe = $this->db->prepare('SELECT 1 FROM Ejercicios WHERE ID_ejercicio = :id');
+        $existe->execute(['id' => (int) $id]);
+        if (!$existe->fetchColumn()) {
+            return $this->error('El ejercicio no existe', 404);
+        }
+
+        $this->exito(['message' => $datos['activo'] ? 'Ejercicio reactivado' : 'Ejercicio dado de baja']);
+    }
+
     /** GET /admin/usuarios: usuarios, roles y métricas para refrescar la tabla. */
     public function listarUsuarios() {
         if (!$this->autorizado()) return;
@@ -380,6 +438,16 @@ class AdminController extends BaseController {
         return null;
     }
 
+    /** Motivo si el teléfono no es válido (es opcional: vacío está bien). */
+    private function errorTelefono(string $telefono): ?string {
+        $telefono = trim($telefono);
+        if ($telefono === '') return null;
+
+        return preg_match('/^[0-9+() -]{6,30}$/', $telefono)
+            ? null
+            : 'El teléfono solo admite números, espacios, +, - y paréntesis (6 a 30 caracteres)';
+    }
+
     /** POST /admin/usuarios: alta de un usuario de cualquier rol. */
     public function crearUsuario() {
         if (!$this->autorizado()) return;
@@ -396,6 +464,9 @@ class AdminController extends BaseController {
         if ($motivo = $this->errorNombreUsuario($nombreUsuario)) {
             return $this->error($motivo, 422, ['campo' => 'nombre_usuario']);
         }
+        if ($motivo = $this->errorTelefono((string) ($datos['telefono'] ?? ''))) {
+            return $this->error($motivo, 422, ['campo' => 'telefono']);
+        }
         if (strlen($password) < 6) {
             return $this->error('La contraseña debe tener al menos 6 caracteres', 422, ['campo' => 'password']);
         }
@@ -408,6 +479,7 @@ class AdminController extends BaseController {
 
         try {
             $id = $this->usuarios->crear($nombre, $nombreUsuario, $password, $rol);
+            $this->usuarios->guardarTelefono($id, (string) ($datos['telefono'] ?? ''));
         } catch (\PDOException $error) {
             return $this->error('No se pudo crear el usuario', 409);
         }
@@ -440,6 +512,9 @@ class AdminController extends BaseController {
         if ($motivo = $this->errorNombreUsuario($nombreUsuario)) {
             return $this->error($motivo, 422, ['campo' => 'nombre_usuario']);
         }
+        if (array_key_exists('telefono', $datos) && ($motivo = $this->errorTelefono((string) $datos['telefono']))) {
+            return $this->error($motivo, 422, ['campo' => 'telefono']);
+        }
         if ($password !== '' && strlen($password) < 6) {
             return $this->error('La contraseña debe tener al menos 6 caracteres', 422, ['campo' => 'password']);
         }
@@ -457,6 +532,9 @@ class AdminController extends BaseController {
 
         try {
             $this->usuarios->actualizar($id, $nombre, $nombreUsuario, $rol, $password !== '' ? $password : null);
+            if (array_key_exists('telefono', $datos)) {
+                $this->usuarios->guardarTelefono($id, (string) $datos['telefono']);
+            }
         } catch (\PDOException $error) {
             return $this->error('No se pudo actualizar el usuario', 409);
         }

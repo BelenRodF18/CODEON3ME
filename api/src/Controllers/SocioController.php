@@ -78,6 +78,50 @@ class SocioController {
         ]);
     }
 
+    /** GET /socio/entrenadores: su entrenador personal y los coaches de sus programas, con foto y contacto. */
+    public function entrenadores() {
+        $usuario = $this->socioActual();
+        if (!$usuario) return;
+
+        $personal = $this->db->prepare(
+            "SELECT pe.ID_usuario AS id, pe.Nombre AS nombre, pe.Foto AS foto, pe.Telefono AS telefono, 'Entrenador personal' AS vinculo
+             FROM Socio_Entrenador se
+             INNER JOIN Usuarios u ON u.ID_usuario = se.ID_entrenador AND u.Activo = 1
+             INNER JOIN Persona pe ON pe.ID_usuario = se.ID_entrenador
+             WHERE se.ID_socio = :socio"
+        );
+        $personal->execute(['socio' => $usuario]);
+
+        $programas = $this->db->prepare(
+            "SELECT pe.ID_usuario AS id, pe.Nombre AS nombre, pe.Foto AS foto, pe.Telefono AS telefono, CONCAT('Coach de ', pr.Nombre) AS vinculo
+             FROM Socio_Programa sp
+             INNER JOIN Programas pr ON pr.ID_programa = sp.ID_programa
+             INNER JOIN Usuarios u ON u.ID_usuario = pr.ID_entrenador AND u.Activo = 1
+             INNER JOIN Persona pe ON pe.ID_usuario = pr.ID_entrenador
+             WHERE sp.ID_socio = :socio
+             ORDER BY pr.Nombre"
+        );
+        $programas->execute(['socio' => $usuario]);
+
+        // Una tarjeta por entrenador, con todos sus vínculos con el socio.
+        $lista = [];
+        foreach (array_merge($personal->fetchAll(\PDO::FETCH_ASSOC), $programas->fetchAll(\PDO::FETCH_ASSOC)) as $fila) {
+            $id = (int) $fila['id'];
+            if (!isset($lista[$id])) {
+                $lista[$id] = [
+                    'id' => $id,
+                    'nombre' => $fila['nombre'],
+                    'foto' => $fila['foto'],
+                    'telefono' => $fila['telefono'],
+                    'vinculos' => [],
+                ];
+            }
+            $lista[$id]['vinculos'][] = $fila['vinculo'];
+        }
+
+        $this->json(['status' => 'success', 'entrenadores' => array_values($lista)]);
+    }
+
     /** GET /socio/rutinas: todas las rutinas asignadas. */
     public function rutinas() {
         $usuario = $this->socioActual();
@@ -102,7 +146,7 @@ class SocioController {
         $rutinas = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         $ex = $this->db->prepare(
-            'SELECT re.ID_rutina_ejercicio AS id, re.Series AS series, re.Repeticiones AS repeticiones, re.Tiempo_descanso AS descanso_segundos, re.Orden AS orden, e.Nombre AS nombre, e.Grupo_muscular AS grupo_muscular
+            'SELECT re.ID_rutina_ejercicio AS id, re.Series AS series, re.Repeticiones AS repeticiones, re.Tiempo_descanso AS descanso_segundos, re.Orden AS orden, re.Notas AS notas, e.Nombre AS nombre, e.Grupo_muscular AS grupo_muscular
              FROM Rutina_Ejercicio re
              INNER JOIN Ejercicios e ON e.ID_ejercicio = re.ID_ejercicio
              WHERE re.ID_rutina = :rutina

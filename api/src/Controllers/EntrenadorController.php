@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\ProgramaModel;
+use App\Models\ProgresoModel;
 
 /** Panel del entrenador: sus programas, sus socios y la creación de rutinas. */
 class EntrenadorController {
@@ -83,6 +84,118 @@ class EntrenadorController {
             'socios' => $this->sociosDe($entrenador),
             'ejercicios' => $ejercicios,
             'rutinas' => $rutinas->fetchAll(\PDO::FETCH_ASSOC),
+        ]);
+    }
+
+    /** GET /entrenador/socios/:id/evolucion: récords, series recientes y constancia de un socio suyo. */
+    public function evolucion($id) {
+        $entrenador = $this->autorizado();
+        if (!$entrenador) return;
+
+        $socio = (int) $id;
+        $vinculo = null;
+        foreach ($this->sociosDe($entrenador) as $candidato) {
+            if ($candidato['id'] === $socio) {
+                $vinculo = $candidato;
+                break;
+            }
+        }
+        if (!$vinculo) {
+            return $this->json(['status' => 'error', 'message' => 'El socio no está asignado a este entrenador ni a sus programas'], 403);
+        }
+
+        $progreso = new ProgresoModel($this->db);
+
+        // Primera carga registrada de cada ejercicio, para medir cuánto mejoró.
+        $primeras = $this->db->prepare(
+            'SELECT e.Nombre AS ejercicio, rp.Carga_utilizada AS carga
+             FROM Registro_Progreso rp
+             INNER JOIN Ejercicios e ON e.ID_ejercicio = rp.ID_ejercicio
+             WHERE rp.ID_usuario = :socio
+               AND rp.ID_registro = (SELECT r2.ID_registro FROM Registro_Progreso r2
+                                     WHERE r2.ID_usuario = rp.ID_usuario AND r2.ID_ejercicio = rp.ID_ejercicio
+                                     ORDER BY r2.Fecha, r2.ID_registro LIMIT 1)'
+        );
+        $primeras->execute(['socio' => $socio]);
+        $primera = [];
+        foreach ($primeras->fetchAll(\PDO::FETCH_ASSOC) as $fila) {
+            $primera[$fila['ejercicio']] = (float) $fila['carga'];
+        }
+
+        $records = $progreso->records($socio);
+        foreach ($records as &$record) {
+            $inicial = $primera[$record['ejercicio']] ?? $record['peso'];
+            $record['primera'] = $inicial;
+            $record['mejora'] = round($record['peso'] - $inicial, 2);
+        }
+        unset($record);
+
+        $recientes = $this->db->prepare(
+            'SELECT e.Nombre AS ejercicio, DATE_FORMAT(rp.Fecha, "%d/%m/%Y") AS fecha, rp.Carga_utilizada AS peso,
+                    rp.Repeticiones_realizadas AS repeticiones, rp.Record_personal AS record, rp.Sensaciones_entrenamiento AS sensacion
+             FROM Registro_Progreso rp
+             INNER JOIN Ejercicios e ON e.ID_ejercicio = rp.ID_ejercicio
+             WHERE rp.ID_usuario = :socio
+             ORDER BY rp.Fecha DESC, rp.ID_registro DESC LIMIT 12'
+        );
+        $recientes->execute(['socio' => $socio]);
+        $series = array_map(function (array $fila): array {
+            $fila['peso'] = (float) $fila['peso'];
+            $fila['repeticiones'] = (int) $fila['repeticiones'];
+            $fila['record'] = (int) $fila['record'] === 1;
+
+            return $fila;
+        }, $recientes->fetchAll(\PDO::FETCH_ASSOC));
+
+        // Constancia: días con entrenamiento registrado en cada una de las últimas 8 semanas.
+        $semanas = [];
+        $lunes = new \DateTimeImmutable('monday this week');
+        for ($i = 7; $i >= 0; $i--) {
+            $inicio = $lunes->modify("-$i weeks");
+            $semanas[$inicio->format('o-W')] = ['desde' => $inicio->format('d/m'), 'dias' => 0, 'series' => 0];
+        }
+        $porSemana = $this->db->prepare(
+            'SELECT DATE_FORMAT(Fecha, "%x-%v") AS clave, COUNT(DISTINCT DATE(Fecha)) AS dias, COUNT(*) AS series
+             FROM Registro_Progreso
+             WHERE ID_usuario = :socio AND Fecha >= :desde
+             GROUP BY clave'
+        );
+        $porSemana->execute(['socio' => $socio, 'desde' => $lunes->modify('-7 weeks')->format('Y-m-d')]);
+        foreach ($porSemana->fetchAll(\PDO::FETCH_ASSOC) as $fila) {
+            if (isset($semanas[$fila['clave']])) {
+                $semanas[$fila['clave']]['dias'] = (int) $fila['dias'];
+                $semanas[$fila['clave']]['series'] = (int) $fila['series'];
+            }
+        }
+
+        $totales = $this->db->prepare(
+            'SELECT COUNT(*) AS series, COUNT(DISTINCT DATE(Fecha)) AS dias, DATE_FORMAT(MIN(Fecha), "%d/%m/%Y") AS desde,
+                    DATE_FORMAT(MAX(Fecha), "%d/%m/%Y") AS ultima
+             FROM Registro_Progreso WHERE ID_usuario = :socio'
+        );
+        $totales->execute(['socio' => $socio]);
+        $resumen = $totales->fetch(\PDO::FETCH_ASSOC);
+
+        $visitas = $this->db->prepare(
+            "SELECT COUNT(DISTINCT DATE(Fecha_hora_ingreso)) FROM Registro_Accesos
+             WHERE ID_usuario = :socio AND Estado_acceso = 'Permitido' AND Fecha_hora_ingreso >= (NOW() - INTERVAL 30 DAY)"
+        );
+        $visitas->execute(['socio' => $socio]);
+
+        $this->json([
+            'status' => 'success',
+            'socio' => ['id' => $vinculo['id'], 'nombre' => $vinculo['nombre'], 'membresia' => $vinculo['membresia'], 'vinculo' => $vinculo['programas']],
+            'resumen' => [
+                'series' => (int) $resumen['series'],
+                'dias_entrenados' => (int) $resumen['dias'],
+                'desde' => $resumen['desde'],
+                'ultima' => $resumen['ultima'],
+                'records' => count($records),
+                'visitas_30_dias' => (int) $visitas->fetchColumn(),
+            ],
+            'records' => $records,
+            'series' => $series,
+            'semanas' => array_values($semanas),
         ]);
     }
 

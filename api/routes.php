@@ -15,6 +15,7 @@ $router->get('/planes', 'CatalogoController@planes');
 $router->get('/planes/:slug', 'CatalogoController@plan');
 $router->get('/socio/resumen', 'SocioController@resumen');
 $router->get('/socio/rutinas', 'SocioController@rutinas');
+$router->get('/socio/entrenadores', 'SocioController@entrenadores');
 $router->post('/socio/reportes', 'SocioController@crearReporte');
 $router->get('/socio/reportes', 'SocioController@reportes');
 $router->get('/socio/reportes/:id/mensajes', 'SocioController@mensajes');
@@ -37,6 +38,8 @@ $router->put('/admin/socios/:id/membresia', 'AdminController@actualizarMembresia
 $router->put('/admin/socios/:id/programas', 'AdminController@inscribirProgramas');
 $router->put('/admin/programas/:id/entrenador', 'AdminController@asignarEntrenadorPrograma');
 $router->post('/admin/ejercicios', 'AdminController@crearEjercicio');
+$router->put('/admin/ejercicios/:id', 'AdminController@actualizarEjercicio');
+$router->put('/admin/ejercicios/:id/estado', 'AdminController@cambiarEstadoEjercicio');
 $router->get('/admin/usuarios', 'AdminController@listarUsuarios');
 $router->post('/admin/usuarios', 'AdminController@crearUsuario');
 $router->put('/admin/usuarios/:id', 'AdminController@actualizarUsuario');
@@ -45,6 +48,7 @@ $router->get('/admin/usuarios/:id/dependencias', 'AdminController@dependenciasUs
 $router->delete('/admin/usuarios/:id', 'AdminController@eliminarUsuario');
 $router->get('/entrenador/resumen', 'EntrenadorController@resumen');
 $router->post('/entrenador/rutinas', 'EntrenadorController@crearRutina');
+$router->get('/entrenador/socios/:id/evolucion', 'EntrenadorController@evolucion');
 $router->get('/personal/conversaciones', 'PersonalController@conversaciones');
 $router->get('/personal/conversaciones/:id/mensajes', 'PersonalController@mensajes');
 $router->post('/personal/conversaciones/:id/mensajes', 'PersonalController@responder');
