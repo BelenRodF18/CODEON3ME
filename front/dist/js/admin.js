@@ -143,6 +143,9 @@
         campoTexto('nombre_usuario', 'Usuario', usuario ? usuario.nombre_usuario : '',
             'required minlength="3" maxlength="30" autocomplete="off" autocapitalize="none" spellcheck="false"',
             'Con esto inicia sesión. Minúsculas, números, punto, guion o guion bajo (ej. juan.diaz).') +
+        campoTexto('telefono', 'Teléfono de contacto (opcional)', usuario ? usuario.telefono : '',
+            'maxlength="30" inputmode="tel" autocomplete="off"',
+            'Los socios lo ven en "Mis entrenadores". Ej. 099 123 456.') +
         '<div class="fp-campo" data-campo="rol_id"><label for="fp-rol">Rol</label>' +
         '<select id="fp-rol" name="rol_id">' + opcionesRol(usuario ? usuario.rol_id : 3) + '</select>' +
         '<p class="fp-campo-error" data-error-de="rol_id"></p></div>' +
@@ -511,15 +514,71 @@
             : vacio('Sin programas', 'Los programas se cargan desde init.sql.', '○');
     };
 
-    // Catálogo de ejercicios.
+    // Catálogo de ejercicios (con editar y dar de baja / reactivar).
     const pintarEjercicios = () => {
         const contenedor = $('ejercicios-admin');
 
         contenedor.innerHTML = estado.ejercicios.length
-            ? estado.ejercicios.map((ejercicio) =>
-                '<div class="exercise-row"><span>' + escapar(ejercicio.nombre) + '</span>' +
-                '<span>' + escapar(ejercicio.grupo_muscular) + '</span></div>').join('')
+            ? estado.ejercicios.map((ejercicio) => {
+                const activo = Number(ejercicio.activo) === 1;
+                return '<div class="exercise-row' + (activo ? '' : ' exercise-row--baja') + '">' +
+                    '<span>' + escapar(ejercicio.nombre) + (activo ? '' : ' <small>(de baja)</small>') + '</span>' +
+                    '<span>' + escapar(ejercicio.grupo_muscular) + '</span>' +
+                    '<span class="exercise-acciones">' +
+                    '<button type="button" class="fp-btn fp-btn--ghost fp-btn--sm" data-ej-accion="editar" data-id="' + ejercicio.id + '">Editar</button>' +
+                    '<button type="button" class="fp-btn fp-btn--sm ' + (activo ? 'fp-btn--peligro-ghost' : 'fp-btn--suave') +
+                    '" data-ej-accion="' + (activo ? 'baja' : 'alta') + '" data-id="' + ejercicio.id + '">' +
+                    (activo ? 'Dar de baja' : 'Reactivar') + '</button></span></div>';
+            }).join('')
             : vacio('Catálogo vacío', 'Agregá el primer ejercicio con el formulario de arriba.', '+');
+    };
+
+    // Modal para editar un ejercicio del catálogo.
+    const abrirEditarEjercicio = (ejercicio) => abrirModal({
+        titulo: 'Editar ejercicio',
+        descripcion: 'Los cambios se ven en las rutinas que ya lo usan.',
+        cuerpo: '<div class="fp-form">' +
+            '<div class="fp-campo fp-campo--full"><label for="fp-ej-nombre">Nombre</label>' +
+            '<input id="fp-ej-nombre" name="nombre" required maxlength="100" value="' + escapar(ejercicio.nombre) + '"></div>' +
+            '<div class="fp-campo fp-campo--full"><label for="fp-ej-grupo">Grupo muscular</label>' +
+            '<input id="fp-ej-grupo" name="grupo_muscular" required maxlength="50" value="' + escapar(ejercicio.grupo_muscular) + '"></div>' +
+            '<div class="fp-campo fp-campo--full"><label for="fp-ej-desc">Descripción</label>' +
+            '<input id="fp-ej-desc" name="descripcion" maxlength="255" value="' + escapar(ejercicio.descripcion || '') + '"></div></div>',
+        aceptar: 'Guardar cambios',
+        alAceptar: async (formulario) => {
+            try {
+                const respuesta = await API.request('/admin/ejercicios/' + ejercicio.id, 'PUT', Object.fromEntries(new FormData(formulario)));
+                if (respuesta.status === 'error') throw new Error(respuesta.message);
+                await cargarTodo();
+                avisoExito('Ejercicio actualizado', 'Se guardaron los cambios en el catálogo.');
+                return true;
+            } catch (fallo) {
+                mostrarFallo(fallo, 'No se pudo guardar el ejercicio');
+                return false;
+            }
+        }
+    });
+
+    // Da de baja o reactiva un ejercicio (no se borra: las rutinas viejas lo conservan).
+    const cambiarEstadoEjercicio = async (ejercicio, activar) => {
+        const confirmado = await confirmar({
+            titulo: activar ? 'Reactivar ejercicio' : 'Dar de baja el ejercicio',
+            descripcion: activar
+                ? ejercicio.nombre + ' vuelve a estar disponible para armar rutinas.'
+                : ejercicio.nombre + ' dejará de aparecer al armar rutinas nuevas. Las rutinas que ya lo usan y el progreso de los socios se conservan.',
+            aceptar: activar ? 'Reactivar' : 'Dar de baja',
+            peligro: !activar
+        });
+        if (!confirmado) return;
+
+        try {
+            const respuesta = await API.request('/admin/ejercicios/' + ejercicio.id + '/estado', 'PUT', { activo: activar });
+            if (respuesta.status === 'error') throw new Error(respuesta.message);
+            await cargarTodo();
+            avisoExito(activar ? 'Ejercicio reactivado' : 'Ejercicio dado de baja', ejercicio.nombre + '.');
+        } catch (fallo) {
+            mostrarFallo(fallo, 'No se pudo cambiar el estado');
+        }
     };
 
     // Guarda plan, entrenador personal y programas del socio (en ese orden).
@@ -703,6 +762,16 @@
                     mostrarFallo(fallo, 'No se pudo agregar el ejercicio');
                 }
             });
+        });
+
+        // Editar, dar de baja o reactivar un ejercicio del catálogo.
+        $('ejercicios-admin').addEventListener('click', (evento) => {
+            const boton = evento.target.closest('[data-ej-accion]');
+            if (!boton) return;
+            const ejercicio = estado.ejercicios.find((item) => String(item.id) === boton.dataset.id);
+            if (!ejercicio) return;
+            if (boton.dataset.ejAccion === 'editar') abrirEditarEjercicio(ejercicio);
+            else cambiarEstadoEjercicio(ejercicio, boton.dataset.ejAccion === 'alta');
         });
 
         // Responder una conversación.

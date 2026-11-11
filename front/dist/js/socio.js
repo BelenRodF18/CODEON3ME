@@ -30,11 +30,20 @@ const formatDate = (value) => value ? new Date(value + 'T00:00:00').toLocaleDate
 
 // Tarjeta de una rutina con sus ejercicios.
 const renderRoutine = (routine) => `<div class="routine-item"><div class="routine-head"><strong>${escapeHtml(routine.nombre)}</strong><small>${escapeHtml(routine.programa || 'Entrenamiento personal')} · ${escapeHtml(routine.entrenador || 'Equipo Fit Power')}</small></div><p class="socio-meta">${escapeHtml(routine.descripcion || 'Rutina personalizada para ti.')}</p><div class="exercise-list">${(routine.ejercicios || []).map((exercise) =>
-    `<div class="exercise-row"><span>${escapeHtml(exercise.nombre)}</span><span>${escapeHtml(exercise.series)} x ${escapeHtml(exercise.repeticiones)} · ${escapeHtml(exercise.descanso_segundos)}s</span></div>`
+    `<div class="exercise-row"><span>${escapeHtml(exercise.nombre)}</span><span>${escapeHtml(exercise.series)} x ${escapeHtml(exercise.repeticiones)} · ${escapeHtml(exercise.descanso_segundos)}s</span>${exercise.notas ? `<p class="exercise-nota"><strong>Nota de tu entrenador:</strong> ${escapeHtml(exercise.notas)}</p>` : ''}</div>`
 ).join('') || '<div class="empty">Tu entrenador aún está cargando los ejercicios.</div>'}</div></div>`;
 
 // Tarjeta de un programa con su coach.
 const renderProgram = (program) => `<div class="routine-item" style="cursor:default"><div class="routine-head" style="align-items:center">${program.entrenador_foto ? `<img src="../assets/imagenes/${escapeHtml(program.entrenador_foto)}" alt="" style="width:42px;height:42px;border-radius:50%;object-fit:cover;margin-right:12px">` : ''}<div style="flex:1"><strong>${escapeHtml(program.nombre)}</strong><p class="socio-meta" style="margin:2px 0 0">Coach: ${escapeHtml(program.entrenador || 'por asignar')}</p></div><a class="socio-button secondary" href="programas.html?programa=${encodeURIComponent(program.slug)}">Ver programa</a></div></div>`;
+
+// Teléfono a formato internacional de Uruguay para el enlace de WhatsApp (099 123 456 -> 59899123456).
+const whatsappDe = (telefono) => {
+    const digitos = String(telefono).replace(/\D/g, '').replace(/^0+/, '');
+    return digitos.startsWith('598') ? digitos : '598' + digitos;
+};
+
+// Tarjeta de un entrenador con su foto, vínculo y contacto.
+const renderTrainer = (trainer) => `<div class="routine-item" style="cursor:default"><div class="routine-head" style="align-items:center">${trainer.foto ? `<img src="../assets/imagenes/${escapeHtml(trainer.foto)}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-right:12px">` : ''}<div style="flex:1"><strong>${escapeHtml(trainer.nombre)}</strong><p class="socio-meta" style="margin:2px 0 0">${escapeHtml(trainer.vinculos.join(' · '))}</p></div>${trainer.telefono ? `<span style="display:flex;gap:8px;flex-wrap:wrap"><a class="socio-button secondary" style="text-decoration:none" href="tel:${escapeHtml(trainer.telefono.replace(/[^+\d]/g, ''))}">Llamar · ${escapeHtml(trainer.telefono)}</a><a class="socio-button" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${whatsappDe(trainer.telefono)}">WhatsApp</a></span>` : '<small class="socio-meta">Sin teléfono cargado. Consultá en recepción.</small>'}</div></div>`;
 
 // Abrir o cerrar una rutina al tocarla.
 const bindRoutineToggle = () => document.querySelectorAll('.routine-item').forEach((item) => item.addEventListener('click', () => item.classList.toggle('open')));
@@ -92,6 +101,9 @@ const loadDashboard = async () => {
     $('membresia-estado').className = 'status-pill ' + (isOk ? 'ok' : 'warn');
     $('membresia-mensaje').textContent = isOk ? 'Tu acceso está habilitado para entrenar este mes.' : 'Acércate a recepción para renovar tu membresía.';
     $('aforo').textContent = data.aforo + ' personas';
+    API.request('/socio/entrenadores').then((res) => {
+        $('home-entrenadores').innerHTML = (res.entrenadores || []).map(renderTrainer).join('') || '<div class="empty">Todavía no tenés un entrenador asignado. Consultá en recepción.</div>';
+    });
     $('home-programas').innerHTML = data.programas.map(renderProgram).join('') || '<div class="empty">Todavía no estás inscripto en ningún programa. Consultá en recepción.</div>';
     $('home-rutinas').innerHTML = data.rutinas.map(renderRoutine).join('') || '<div class="empty">Todavía no tienes rutinas asignadas.</div>';
     bindRoutineToggle();

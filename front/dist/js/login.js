@@ -14,9 +14,13 @@ const mensaje = document.getElementById('mensaje-login');
 // Muestra un aviso debajo del formulario.
 const mostrarMensaje = (texto, tipo = 'error') => {
     mensaje.textContent = texto;
-    mensaje.className = (tipo === 'error' ? 'text-danger' : 'text-success') + ' small mb-3';
+    mensaje.className = (tipo === 'error' ? 'text-danger' : tipo === 'aviso' ? 'text-warning' : 'text-success') + ' small mb-3';
     mensaje.style.display = texto ? 'block' : 'none';
 };
+
+// Si lo mandaron acá porque la sesión venció o cambió la cuenta, lo explica.
+const motivo = new URLSearchParams(window.location.search).get('motivo');
+if (MOTIVOS_LOGIN[motivo]) mostrarMensaje(MOTIVOS_LOGIN[motivo], 'aviso');
 
 // Si ya hay sesión, va directo a su panel.
 (async () => {
@@ -25,6 +29,7 @@ const mostrarMensaje = (texto, tipo = 'error') => {
     const panel = PANELES[sesion.usuario.rol];
     if (!panel) return;
 
+    recordarSesion(sesion.usuario);
     window.location.href = panel;
 })();
 
@@ -47,6 +52,7 @@ document.getElementById('form-login').addEventListener('submit', async function(
         return;
     }
 
+    recordarSesion(respuesta.usuario);
     const panel = PANELES[respuesta.usuario.rol];
     if (panel) {
         window.location.href = panel;

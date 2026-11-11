@@ -61,7 +61,11 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
 .exercise-list { display: none; border-top: 1px solid #2d3931; margin-top: 14px; padding-top: 12px; }
 .routine-item.open .exercise-list { display: grid; gap: 9px; }
 .exercise-row { display: flex; justify-content: space-between; gap: 12px; color: #d8e0d7; font-size: 13px; }
-.exercise-row span:last-child { color: var(--mint); text-align: right; }
+.exercise-row { align-items: center; }
+.exercise-row span:nth-child(2) { color: var(--mint); margin-left: auto; }
+.exercise-row span:last-child { text-align: right; }
+.exercise-acciones { display: flex; gap: 6px; }
+.exercise-row--baja > span:first-child, .exercise-row--baja > span:nth-child(2) { opacity: .5; }
 
 /* --------------------------------------------------------------- Formularios */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -99,6 +103,10 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
 
 /* -------------------------------------------- Ejercicios al crear una rutina */
 .rutina-row { display: grid; grid-template-columns: 1fr 100px 160px; gap: 10px; margin-bottom: 10px; } .rutina-row label { display: grid; gap: 6px; }
+.rutina-row .rutina-nota { grid-column: 1 / -1; }
+.exercise-row { flex-wrap: wrap; }
+.exercise-nota { flex-basis: 100%; margin: 0; padding: 8px 10px; border-left: 3px solid var(--mint); background: rgba(170, 250, 100, .07); border-radius: 6px; color: #d8e0d7; font-size: 12px; }
+.exercise-nota strong { color: var(--mint); }
 
 /* ------------------------------------------------------- Historial de series */
 .chart-row { display: grid; grid-template-columns: 1.2fr .6fr .6fr .8fr auto; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid #29342d; font-size: 13px; }
@@ -127,4 +135,21 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
     .socio-card, .socio-card.wide { grid-column: 1 / -1; } .form-grid, .qr-layout { grid-template-columns: 1fr; } .qr-box { margin: 0 auto; }
     .chart-row { grid-template-columns: 1fr 1fr; gap: 7px; } .chart-row span:first-child { grid-column: 1 / -1; }
     .rutina-row { grid-template-columns: 1fr 1fr; } .nav-badge { position: static; transform: none; margin-left: 6px; } .rutina-row label:first-child { grid-column: 1 / -1; }
+}
+
+.evo-chart { display: flex; align-items: flex-end; gap: 10px; height: 170px; margin-top: 14px; }
+.evo-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+.evo-bar { width: 100%; max-width: 46px; min-height: 3px; background: var(--mint); border-radius: 6px 6px 0 0; }
+.evo-num { font-size: 12px; color: var(--mint); font-weight: 700; }
+.evo-col small { color: var(--muted); font-size: 11px; }
+.evo-sube { color: var(--mint) !important; }
+
+.evo-serie { display: grid; grid-template-columns: minmax(0, 1.6fr) 100px 80px 130px minmax(0, 1fr); gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid #29342d; font-size: 13px; }
+.evo-serie strong { color: var(--mint); }
+.evo-serie small { text-align: right; }
+@media (max-width: 720px) {
+  .evo-serie { grid-template-columns: 1fr 1fr; }
+  .evo-serie-nombre { grid-column: 1 / -1; font-weight: 700; }
+  .evo-serie small { text-align: left; }
+  .evo-chart { gap: 5px; }
 }
