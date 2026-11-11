@@ -335,14 +335,41 @@
             "box-shadow:0 4px 14px rgba(0,0,0,.4);transition:transform .15s,background .15s}" +
             ".fp-idioma:hover{transform:translateY(-2px);background:#1c1c1c}" +
             ".fp-idioma:focus-visible{outline:2px solid #AAFA64;outline-offset:2px}" +
-            ".fp-idioma b{color:#AAFA64}";
+            ".fp-idioma b{color:#AAFA64}" +
+            ".fp-idioma--oculto{opacity:0;transform:translateY(16px);pointer-events:none}" +
+            "@media (max-width:600px){.fp-idioma{right:12px;bottom:12px;padding:7px 11px;font-size:12px}}" +
+            "@media (min-width:781px){.fp-idioma--lateral{right:auto;left:18px;bottom:84px}}" +
+            ".fp-idioma--en-menu{position:static;box-shadow:none;margin:0;padding:6px 10px;font-size:12px;flex:0 0 auto}";
         document.head.appendChild(estilo);
         boton = document.createElement("button");
         boton.type = "button";
         boton.className = "fp-idioma";
+        // En los paneles con menú lateral queda en el hueco del menú: no tapa contenido.
+        if (document.querySelector(".socio-sidebar")) boton.classList.add("fp-idioma--lateral");
         boton.setAttribute("data-i18n-skip", "");
         boton.addEventListener("click", () => cambiarIdioma(idioma === "es" ? "en" : "es"));
         document.body.appendChild(boton);
+        // En celular, los paneles lo llevan dentro de la cabecera del menú (no flota sobre el contenido).
+        const movil = window.matchMedia("(max-width:780px)");
+        const ubicar = () => {
+            const marca = document.querySelector(".socio-sidebar .socio-brand, .rec-topbar");
+            if (!marca) return;
+            if (movil.matches) { marca.appendChild(boton); boton.classList.add("fp-idioma--en-menu"); }
+            else { document.body.appendChild(boton); boton.classList.remove("fp-idioma--en-menu"); }
+        };
+        ubicar();
+        if (movil.addEventListener) movil.addEventListener("change", ubicar);
+        // Se esconde al bajar la página (para no tapar botones) y vuelve al subir o al llegar al final.
+        let ultimoY = window.scrollY;
+        window.addEventListener("scroll", () => {
+            const y = window.scrollY;
+            const alFinal = window.innerHeight + y >= document.documentElement.scrollHeight - 40;
+            const lateral = boton.classList.contains("fp-idioma--lateral") && window.innerWidth > 780;
+            if (lateral) return;
+            if (y > ultimoY + 4 && y > 120 && !alFinal) boton.classList.add("fp-idioma--oculto");
+            else if (y < ultimoY - 4 || y <= 120 || alFinal) boton.classList.remove("fp-idioma--oculto");
+            ultimoY = y;
+        }, { passive: true });
     }
 
     function actualizarBoton() {

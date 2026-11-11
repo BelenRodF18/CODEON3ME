@@ -400,3 +400,44 @@
     .slider-flecha-izq { left: -8px; }
     .slider-flecha-der { right: -8px; }
 }
+
+/* ---------------------------------------------- Correcciones de responsive */
+@media (max-width: 600px) {
+    .caja-borde-historia {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .historia-imagenes {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        flex-direction: row !important;
+    }
+    .columna-img-pildora {
+        min-width: 0 !important;
+        height: 240px !important;
+    }
+    .historia-contenido {
+        width: 100% !important;
+        padding-left: 0 !important;
+    }
+    .caja-borde-programas .row,
+    .caja-borde-contacto .row {
+        --bs-gutter-x: 1.5rem;
+    }
+}
+@media (max-width: 400px) {
+    .titulo-contacto {
+        font-size: clamp(26px, 9vw, 38px) !important;
+        overflow-wrap: anywhere;
+    }
+}
+@media (max-width: 600px) {
+    .caja-borde-programas .row,
+    .caja-borde-contacto .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+
+        width: 100% !important;
+    }
+}

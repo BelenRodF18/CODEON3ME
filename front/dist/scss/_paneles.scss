@@ -153,3 +153,28 @@ body.socio-app { margin: 0; min-height: 100vh; background: #070908; color: #f4f7
   .evo-serie small { text-align: left; }
   .evo-chart { gap: 5px; }
 }
+
+/* ---------------------------------------------- Correcciones de responsive */
+.socio-main { min-width: 0; }
+.routine-item { min-width: 0; }
+.routine-head { flex-wrap: wrap; }
+.routine-head > * { min-width: 0; }
+.routine-head strong { overflow-wrap: anywhere; }
+.field select, .field input, .field textarea { max-width: 100%; min-width: 0; }
+.fp-toasts { bottom: 64px; }
+@media (max-width: 900px) {
+  .rec-grid { grid-template-columns: minmax(0, 1fr); }
+  .rec-card { min-width: 0; }
+}
+.rec-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); }
+.rec-stat, .rec-stats .fp-stat { min-width: 0; }
+.rec-stats dd { overflow-wrap: anywhere; }
+@media (max-width: 1100px) {
+  .socio-card { grid-column: span 6; }
+  .socio-card.wide, .socio-card.full { grid-column: 1 / -1; }
+}
+@media (max-width: 960px) {
+  .socio-card, .socio-card.wide, .socio-card.full { grid-column: 1 / -1; }
+}
+.rec-manual > * { min-width: 0; max-width: 100%; }
+.rec-topbar .fp-idioma--en-menu { margin-left: auto; }
