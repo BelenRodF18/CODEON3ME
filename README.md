@@ -54,6 +54,17 @@ Lo único que necesitás es tener **Docker** instalado.
 
 5. Entrá a **http://localhost:8080** y listo.
 
+### Correo del formulario de contacto
+
+El formulario de «Más información» manda cada mensaje por correo a la cuenta de Gmail del gimnasio (`fitpowercodeon@gmail.com`). Para que funcione hay que completar dos datos en `api/.env`:
+
+```
+MAIL_USUARIO=fitpowercodeon@gmail.com
+MAIL_CLAVE=la-contraseña-de-aplicación
+```
+
+`MAIL_CLAVE` **no es la contraseña normal de la cuenta**: Gmail solo deja enviar correos desde un programa con una *contraseña de aplicación* (se crea en la cuenta de Google, en Seguridad > Verificación en dos pasos > Contraseñas de aplicaciones). Ese archivo no se sube a GitHub. Si falta, el formulario responde que no pudo enviar el mensaje.
+
 ### Direcciones útiles
 
 | Qué | Dónde |

@@ -441,3 +441,75 @@
         width: 100% !important;
     }
 }
+
+/* ---------------------------------------------- Separación entre cajas en celular */
+/* Todas las cajas y tarjetas se separan con la misma medida (20 px), en todas las páginas. */
+@media (max-width: 768px) {
+    :root {
+        --espacio-cajas: 20px;
+        --alto-menu: 70px;
+    }
+
+    /* Cada bloque de la página sin rellenos, márgenes ni alturas mínimas propias */
+    main > section,
+    main > div {
+        margin: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        min-height: 0 !important;
+    }
+    /* Bootstrap pone su propio relleno (py-5) en algunos contenedores */
+    main > div[class*="py-"] {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    main [class*="contenedor-"] {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        min-height: 0 !important;
+    }
+    main [class*="caja-borde"] {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* La separación entre una caja y la que sigue la da solo esta regla */
+    main > :is(section, div) + :is(section, div) {
+        margin-top: var(--espacio-cajas) !important;
+    }
+
+    /* Arriba queda el menú fijo y abajo el pie: también con la misma medida */
+    main {
+        padding-top: calc(var(--alto-menu) + var(--espacio-cajas));
+        padding-bottom: var(--espacio-cajas);
+    }
+
+    /* Tarjetas que están dentro de una caja */
+    .cuadricula-tarjetas,
+    .contenedor-tarjetas,
+    .bloque-entrenadores {
+        gap: var(--espacio-cajas) !important;
+    }
+    /* El botón de idioma va en el menú de arriba, al lado de la hamburguesa */
+    .navbar .fp-idioma {
+        order: 3;
+        margin: 0 14px 0 auto !important;
+    }
+    .navbar .iconos-nav {
+        margin: 0 !important;
+    }
+
+    /* Tarjetas de Bootstrap (filas con g-3, g-4...): la separación vertical también es la misma */
+    main .row {
+        --bs-gutter-y: var(--espacio-cajas);
+    }
+
+    /* Las tarjetas con texto (las que están dentro de una fila de Bootstrap) crecen lo que haga falta:
+       antes se les fijaban 180 px y se cortaba el texto. Las tarjetas con foto de la página de inicio no cambian. */
+    main .row .tarjeta-item {
+        height: auto !important;
+        min-height: 180px;
+    }
+}

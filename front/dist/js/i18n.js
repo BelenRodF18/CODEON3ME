@@ -348,18 +348,22 @@
         boton.setAttribute("data-i18n-skip", "");
         boton.addEventListener("click", () => cambiarIdioma(idioma === "es" ? "en" : "es"));
         document.body.appendChild(boton);
-        // En los paneles no flota: en escritorio va dentro del menú lateral (arriba de "Ir al inicio")
-        // y en celular dentro de la cabecera. Así nunca queda encima de otro botón.
+        // En celular no flota: va dentro de la cabecera (paneles) o del menú de arriba (web pública).
+        // En los paneles de escritorio va dentro del menú lateral. Así no queda encima de otro botón.
         const movil = window.matchMedia("(max-width:780px)");
         const lado = document.querySelector(".socio-sidebar");
         const ubicar = () => {
             const marca = document.querySelector(".socio-sidebar .socio-brand, .rec-topbar");
-            if (!marca) return;
+            const menuPublico = document.querySelector("nav.navbar");
             boton.classList.remove("fp-idioma--en-menu", "fp-idioma--en-lado");
-            if (movil.matches) {
+            if (movil.matches && marca) {
                 marca.appendChild(boton);
                 boton.classList.add("fp-idioma--en-menu");
-            } else if (lado) {
+            } else if (movil.matches && menuPublico) {
+                // En la web pública, en celular, va en el menú de arriba (al lado de la hamburguesa).
+                menuPublico.insertBefore(boton, menuPublico.querySelector(".menu-hamburguesa"));
+                boton.classList.add("fp-idioma--en-menu");
+            } else if (lado && !movil.matches) {
                 lado.insertBefore(boton, lado.querySelector(".socio-inicio") || lado.querySelector(".socio-logout"));
                 boton.classList.add("fp-idioma--en-lado");
             } else {

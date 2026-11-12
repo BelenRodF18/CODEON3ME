@@ -214,3 +214,13 @@ button.socio-avatar:hover, button.socio-avatar:focus-visible { box-shadow: 0 0 0
 @media (min-width: 781px) {
   .socio-inicio, .socio-logout { font-family: inherit; font-size: 14px; font-weight: 600; }
 }
+
+/* ---------------------------------------------- Separación entre cajas en celular */
+/* Todas las cajas y tarjetas de los paneles se separan con la misma medida (20 px). */
+:root { --espacio-cajas: 20px; }
+@media (max-width: 780px) {
+  .socio-grid, .routine-list, .records-grid, .fp-stats, .rec-stats, .rec-grid { gap: var(--espacio-cajas); }
+  .socio-view > * + * { margin-top: var(--espacio-cajas) !important; }
+  .rec-grid { margin-top: var(--espacio-cajas); }
+  .rec-stats { margin-bottom: var(--espacio-cajas); }
+}

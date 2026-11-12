@@ -165,9 +165,9 @@ const cargarEvolucion = async () => {
         `<div class="socio-card full"><h3>${escapeHtml(datos.socio.nombre)}</h3><p class="socio-meta">${escapeHtml(datos.socio.vinculo || 'Entrenamiento personal')} · Membresía: ${escapeHtml(datos.socio.membresia)}</p>` +
         `<div class="records-grid">${kpi(r.series, 'series registradas')}${kpi(r.dias_entrenados, 'días entrenados')}${kpi(r.records, 'récords personales')}${kpi(r.visitas_30_dias, 'visitas al gym (30 días)')}</div>` +
         `<p class="socio-meta" style="margin-top:10px">${r.series ? 'Primer registro: ' + escapeHtml(r.desde) + ' · Último: ' + escapeHtml(r.ultima) : 'Todavía no registró entrenamientos.'}</p></div>` +
-        `<div class="socio-card full" style="margin-top:18px"><h3>Constancia: días entrenados por semana</h3><p class="socio-meta">Últimas 8 semanas (cada barra empieza el lunes indicado).</p><div class="evo-chart">${barras}</div></div>` +
-        `<div class="socio-card full" style="margin-top:18px"><h3>Récords y mejora</h3><div class="records-grid">${records}</div></div>` +
-        `<div class="socio-card full" style="margin-top:18px"><h3>Últimas series</h3>${series}</div>`;
+        `<div class="socio-card full" style="margin-top:20px"><h3>Constancia: días entrenados por semana</h3><p class="socio-meta">Últimas 8 semanas (cada barra empieza el lunes indicado).</p><div class="evo-chart">${barras}</div></div>` +
+        `<div class="socio-card full" style="margin-top:20px"><h3>Récords y mejora</h3><div class="records-grid">${records}</div></div>` +
+        `<div class="socio-card full" style="margin-top:20px"><h3>Últimas series</h3>${series}</div>`;
 };
 
 document.getElementById('evolucion-socio').onchange = cargarEvolucion;

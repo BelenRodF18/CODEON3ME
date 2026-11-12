@@ -213,9 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // --- Formulario de contacto (página "Conocer más") ---
-// Se envía con FormSubmit (formsubmit.co), que reenvía el mensaje al correo del gimnasio.
-// La primera vez FormSubmit manda un correo de activación a esta dirección: hay que confirmarlo.
-const CONTACTO_DESTINO = "belenrodriguezinfo3@gmail.com";
+// El mensaje va a la API (POST /contacto), que lo manda por correo a la cuenta de Gmail del gimnasio.
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("form-contacto");
@@ -239,7 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return mostrar("¡Gracias! Te vamos a contactar a la brevedad.", "ok");
         }
 
-        const nombre = (datos.nombre + " " + datos.apellido).trim();
         const medio = datos.contacto.trim();
         const esEmail = /^\S+@\S+\.\S+$/.test(medio);
         const esTelefono = /^[+\d][\d\s().-]{6,}$/.test(medio);
@@ -257,26 +254,16 @@ document.addEventListener("DOMContentLoaded", () => {
         boton.disabled = true;
         mostrar("Enviando...");
 
-        // Si dejó un correo, "Responder" en Gmail le contesta directo a él
-        const cuerpo = {
-            _subject: "Contacto web FitPower: " + nombre,
-            _template: "table",
-            _captcha: "false",
-            Nombre: nombre,
-            Contacto: medio,
-            Mensaje: datos.mensaje.trim()
-        };
-        if (esEmail) cuerpo.email = medio;
-
         try {
-            const respuesta = await fetch("https://formsubmit.co/ajax/" + CONTACTO_DESTINO, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify(cuerpo)
+            const respuesta = await API.request("/contacto", "POST", {
+                nombre: datos.nombre.trim(),
+                apellido: datos.apellido.trim(),
+                contacto: medio,
+                mensaje: datos.mensaje.trim(),
+                sitio_web: datos.sitio_web || ""
             });
-            const json = await respuesta.json();
 
-            if (json.success === true || json.success === "true") {
+            if (respuesta.status === "success") {
                 form.reset();
                 mostrar("¡Gracias! Te vamos a contactar a la brevedad.", "ok");
             } else {
