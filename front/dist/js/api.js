@@ -75,3 +75,13 @@ if (enPanel()) {
     setInterval(vigilarSesion, 60000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) vigilarSesion(); });
 }
+
+
+// HTML de la foto de un reporte de mantenimiento (vacío si no tiene). Al tocarla se abre en grande.
+function fotoDeReporte(ruta) {
+    if (!/^uploads\/mantenimiento\/[a-f0-9]{32}\.(jpg|png|webp)$/.test(ruta || '')) return '';
+    const url = '/api/' + ruta;
+    return '<a href="' + url + '" target="_blank" rel="noopener" title="Ver foto completa">' +
+        '<img src="' + url + '" alt="Foto del reporte" loading="lazy" ' +
+        'style="display:block;max-width:100%;max-height:260px;margin:10px 0;border-radius:10px;object-fit:cover"></a>';
+}

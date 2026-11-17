@@ -1,7 +1,8 @@
 <?php
 /**
- * Instala la base de datos sin Docker: php api/config/setup.php [--reset-passwords]
+ * Instala la base de datos sin Docker: php api/config/setup.php [--reset-passwords] [--datos-demo]
  * Ejecuta init.sql (se puede correr varias veces sin romper nada) y revisa que existan las cuentas de ejemplo.
+ * Con --datos-demo carga además datos_demo.sql: socios, rutinas, progreso, ingresos y conversaciones de ejemplo.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -123,6 +124,28 @@ foreach ($sentencias as $sentencia) {
 salida('Esquema aplicado (' . $ejecutadas . ' sentencias).');
 
 $pdo->exec('USE `' . str_replace('`', '', $name) . '`');
+
+// Con --datos-demo se cargan los datos de demostración (socios, rutinas, progreso, ingresos y conversaciones).
+if (in_array('--datos-demo', $argv, true)) {
+    $demo = file_get_contents(__DIR__ . '/datos_demo.sql');
+    if ($demo === false) {
+        salida('No se pudo leer datos_demo.sql');
+        exit(1);
+    }
+
+    $cargadas = 0;
+    foreach (dividirSql($demo) as $sentencia) {
+        try {
+            $pdo->exec($sentencia);
+            $cargadas++;
+        } catch (PDOException $e) {
+            salida('Error en datos_demo.sql: ' . substr(preg_replace('/\s+/', ' ', $sentencia), 0, 120) . '...');
+            salida('Detalle: ' . $e->getMessage());
+            exit(1);
+        }
+    }
+    salida('Datos de demostración cargados (' . $cargadas . ' sentencias).');
+}
 
 $roles = $pdo->query('SELECT ID_tipo, Nombre FROM Tipo_usuario ORDER BY ID_tipo')->fetchAll(PDO::FETCH_KEY_PAIR);
 salida('Roles: ' . implode(', ', $roles));

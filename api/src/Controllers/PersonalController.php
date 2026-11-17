@@ -33,7 +33,7 @@ class PersonalController {
         if (!$this->autorizado()) return;
 
         $stmt = $this->db->query(
-            "SELECT c.ID_chat AS id, c.Titulo AS etiqueta, c.Descripcion AS descripcion, LOWER(REPLACE(c.Estado, ' ', '_')) AS estado, DATE_FORMAT(c.Fecha_hora, '%d/%m/%Y %H:%i') AS creado, p.Nombre AS socio
+            "SELECT c.ID_chat AS id, c.Titulo AS etiqueta, c.Descripcion AS descripcion, LOWER(REPLACE(c.Estado, ' ', '_')) AS estado, c.Foto AS foto_path, DATE_FORMAT(c.Fecha_hora, '%d/%m/%Y %H:%i') AS creado, p.Nombre AS socio
              FROM Chat c
              INNER JOIN Persona p ON p.ID_usuario = c.ID_usuario
              WHERE c.Tipo_chat = 'Mantenimiento'

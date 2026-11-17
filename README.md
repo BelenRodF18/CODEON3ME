@@ -76,6 +76,17 @@ MAIL_CLAVE=la-contraseña-de-aplicación
 
 Para apagarlo: `docker compose down`. Si querés empezar de cero y borrar también la base: `docker compose down -v`.
 
+## Datos de demostración completos
+
+`init.sql` crea las tablas y unos pocos datos. Para la demo hay un juego completo: 13 socios (con planes, pagos, programas, rutinas, series con récords, ingresos al gimnasio y conversaciones), 28 rutinas repartidas entre los 8 entrenadores y un catálogo de 62 ejercicios.
+
+```bash
+php api/config/setup.php --datos-demo          # sin Docker
+mysql fitpower < api/config/datos_demo.sql     # o directo con el cliente de MySQL
+```
+
+Cuidado: borra a **todos los socios menos `socio`** y vuelve a crear todas las rutinas. Se puede correr las veces que haga falta. Las fechas se calculan desde el día en que se ejecuta (la gente "adentro ahora" y los ingresos de hoy dependen de la hora), así que conviene correrlo el día de la demo.
+
 ## Cuentas de prueba
 
 Todas tienen la misma contraseña: **`fitpower123`**
@@ -86,6 +97,7 @@ Todas tienen la misma contraseña: **`fitpower123`**
 | `entrenador` | Entrenador (Carlos Pérez) |
 | `socio` | Socio (Socio Demo) |
 | `martina.lopez` | Socio con plan Pro, rutinas y programas ya armados |
+| `juan.diaz`, `diego.torres`, `lucas.gomez`, `sofia.rey`, `elena.paz`, `bruno.soler`, `matias.rossi` | Los otros 7 entrenadores |
 | `recepcion` | Recepción |
 | `personal` | Mantenimiento |
 
@@ -100,7 +112,7 @@ CODEON3ME/
 ├── api/                    El "cerebro": recibe pedidos y habla con la base de datos (PHP)
 │   ├── index.php           Puerta de entrada de la API
 │   ├── routes.php          Lista de direcciones y quién las atiende
-│   ├── config/             Conexión a MySQL, init.sql (crea las tablas y los datos de ejemplo)
+│   ├── config/             Conexión a MySQL, init.sql (tablas y datos base) y datos_demo.sql (datos de demostración completos)
 │   ├── src/
 │   │   ├── Controllers/    Reciben el pedido, lo validan y arman la respuesta
 │   │   ├── Models/         Hacen las consultas a la base de datos

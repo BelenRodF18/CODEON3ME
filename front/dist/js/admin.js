@@ -528,7 +528,8 @@
                     '<button type="button" class="fp-btn fp-btn--ghost fp-btn--sm" data-ej-accion="editar" data-id="' + ejercicio.id + '">Editar</button>' +
                     '<button type="button" class="fp-btn fp-btn--sm ' + (activo ? 'fp-btn--peligro-ghost' : 'fp-btn--suave') +
                     '" data-ej-accion="' + (activo ? 'baja' : 'alta') + '" data-id="' + ejercicio.id + '">' +
-                    (activo ? 'Dar de baja' : 'Reactivar') + '</button></span></div>';
+                    (activo ? 'Dar de baja' : 'Reactivar') + '</button>' +
+                    '<button type="button" class="fp-btn fp-btn--sm fp-btn--peligro-ghost" data-ej-accion="borrar" data-id="' + ejercicio.id + '">Borrar</button></span></div>';
             }).join('')
             : vacio('Catálogo vacío', 'Agregá el primer ejercicio con el formulario de arriba.', '+');
     };
@@ -579,6 +580,63 @@
         } catch (fallo) {
             mostrarFallo(fallo, 'No se pudo cambiar el estado');
         }
+    };
+
+    // Borra un ejercicio del catálogo para siempre (pide confirmar y avisa qué se pierde).
+    const borrarEjercicio = async (ejercicio) => {
+        let usos = { rutinas: 0, series: 0 };
+        let requiereExtra = false;
+
+        try {
+            const respuesta = await API.request('/admin/ejercicios/' + ejercicio.id + '/dependencias');
+            if (respuesta.status === 'error') throw new Error(respuesta.message);
+            usos = respuesta.dependencias;
+            requiereExtra = respuesta.requiere_confirmacion_extra;
+        } catch (fallo) {
+            mostrarFallo(fallo, 'No se pudo consultar el ejercicio');
+            return;
+        }
+
+        const items = [];
+        if (usos.rutinas > 0) items.push('<li>Se quita de ' + usos.rutinas + (usos.rutinas === 1 ? ' rutina' : ' rutinas') + ' de los entrenadores</li>');
+        if (usos.series > 0) items.push('<li>Se borran ' + usos.series + (usos.series === 1 ? ' serie registrada' : ' series registradas') + ' por los socios</li>');
+
+        const cuerpo =
+            '<div class="fp-aviso fp-aviso--peligro"><div>Esta acción es <strong>permanente</strong>. ' +
+            escapar(ejercicio.nombre) + ' será eliminado del catálogo y no se podrá recuperar.<br>' +
+            'Si solo querés que no aparezca al armar rutinas nuevas, usá <strong>Dar de baja</strong>.</div></div>' +
+            (items.length ? '<div class="fp-aviso fp-aviso--aviso"><div><strong>También se perderá:</strong><ul>' + items.join('') + '</ul></div></div>' : '') +
+            (requiereExtra
+                ? '<div class="fp-campo fp-campo--full"><label style="display:flex;gap:9px;align-items:flex-start;font-weight:400">' +
+                  '<input type="checkbox" name="forzar" style="width:auto;margin-top:2px" required> ' +
+                  'Entiendo que también se perderá lo que figura arriba.</label></div>'
+                : '');
+
+        const confirmado = await abrirModal({
+            titulo: 'Eliminar ejercicio',
+            cuerpo,
+            aceptar: 'Eliminar definitivamente',
+            cancelar: 'Cancelar',
+            peligro: true,
+            alAceptar: async (formulario) => {
+                const forzar = formulario.querySelector('[name="forzar"]');
+                if (forzar && !forzar.checked) return false;
+
+                try {
+                    const resultado = await API.request('/admin/ejercicios/' + ejercicio.id + (forzar ? '?forzar=1' : ''), 'DELETE');
+                    if (resultado.status === 'error') throw new Error(resultado.message);
+                    return true;
+                } catch (fallo) {
+                    avisoError('No se pudo eliminar', fallo.message);
+                    return false;
+                }
+            }
+        });
+
+        if (confirmado !== true) return;
+
+        await cargarTodo();
+        avisoExito('Ejercicio eliminado', ejercicio.nombre + ' fue borrado del catálogo.');
     };
 
     // Guarda plan, entrenador personal y programas del socio (en ese orden).
@@ -657,6 +715,7 @@
                 escapar(conversacion.etiqueta) + '</strong>' +
                 badge(ESTADOS_CONVERSACION[conversacion.estado] || conversacion.estado, conversacion.estado === 'solucionado' ? 'activo' : 'info') +
                 '</header><p>' + escapar(conversacion.descripcion) + '</p>' +
+                fotoDeReporte(conversacion.foto_path) +
                 '<small class="socio-meta">' + escapar(conversacion.socio) + ' · ' + escapar(conversacion.creado) + '</small>' +
                 '<div id="admin-chat-' + conversacion.id + '" class="chat-messages">' + cargando(1) + '</div>' +
                 '<form class="admin-reply" data-id="' + conversacion.id + '" style="display:flex;gap:8px;margin-top:8px">' +
@@ -771,6 +830,7 @@
             const ejercicio = estado.ejercicios.find((item) => String(item.id) === boton.dataset.id);
             if (!ejercicio) return;
             if (boton.dataset.ejAccion === 'editar') abrirEditarEjercicio(ejercicio);
+            else if (boton.dataset.ejAccion === 'borrar') borrarEjercicio(ejercicio);
             else cambiarEstadoEjercicio(ejercicio, boton.dataset.ejAccion === 'alta');
         });
 

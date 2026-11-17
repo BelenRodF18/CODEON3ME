@@ -43,6 +43,8 @@ $router->put('/admin/programas/:id/entrenador', 'AdminController@asignarEntrenad
 $router->post('/admin/ejercicios', 'AdminController@crearEjercicio');
 $router->put('/admin/ejercicios/:id', 'AdminController@actualizarEjercicio');
 $router->put('/admin/ejercicios/:id/estado', 'AdminController@cambiarEstadoEjercicio');
+$router->get('/admin/ejercicios/:id/dependencias', 'AdminController@dependenciasEjercicio');
+$router->delete('/admin/ejercicios/:id', 'AdminController@eliminarEjercicio');
 $router->get('/admin/usuarios', 'AdminController@listarUsuarios');
 $router->post('/admin/usuarios', 'AdminController@crearUsuario');
 $router->put('/admin/usuarios/:id', 'AdminController@actualizarUsuario');
@@ -51,6 +53,8 @@ $router->get('/admin/usuarios/:id/dependencias', 'AdminController@dependenciasUs
 $router->delete('/admin/usuarios/:id', 'AdminController@eliminarUsuario');
 $router->get('/entrenador/resumen', 'EntrenadorController@resumen');
 $router->post('/entrenador/rutinas', 'EntrenadorController@crearRutina');
+$router->put('/entrenador/rutinas/:id', 'EntrenadorController@actualizarRutina');
+$router->delete('/entrenador/rutinas/:id', 'EntrenadorController@eliminarRutina');
 $router->get('/entrenador/socios/:id/evolucion', 'EntrenadorController@evolucion');
 $router->get('/personal/conversaciones', 'PersonalController@conversaciones');
 $router->get('/personal/conversaciones/:id/mensajes', 'PersonalController@mensajes');

@@ -410,6 +410,69 @@ class AdminController extends BaseController {
         $this->exito(['message' => $datos['activo'] ? 'Ejercicio reactivado' : 'Ejercicio dado de baja']);
     }
 
+    /** Cuántas rutinas y series registradas usan un ejercicio (se borran junto con él). */
+    private function usosDeEjercicio(int $id): array {
+        $rutinas = $this->db->prepare('SELECT COUNT(DISTINCT ID_rutina) FROM Rutina_Ejercicio WHERE ID_ejercicio = :id');
+        $rutinas->execute(['id' => $id]);
+        $series = $this->db->prepare('SELECT COUNT(*) FROM Registro_Progreso WHERE ID_ejercicio = :id');
+        $series->execute(['id' => $id]);
+
+        return ['rutinas' => (int) $rutinas->fetchColumn(), 'series' => (int) $series->fetchColumn()];
+    }
+
+    /** GET /admin/ejercicios/:id/dependencias: qué se pierde si se borra el ejercicio. */
+    public function dependenciasEjercicio($id) {
+        if (!$this->autorizado()) return;
+
+        $existe = $this->db->prepare('SELECT Nombre FROM Ejercicios WHERE ID_ejercicio = :id');
+        $existe->execute(['id' => (int) $id]);
+        $nombre = $existe->fetchColumn();
+        if ($nombre === false) {
+            return $this->error('El ejercicio no existe', 404);
+        }
+
+        $usos = $this->usosDeEjercicio((int) $id);
+        $this->exito([
+            'ejercicio' => $nombre,
+            'dependencias' => $usos,
+            'requiere_confirmacion_extra' => $usos['rutinas'] > 0 || $usos['series'] > 0,
+        ]);
+    }
+
+    /**
+     * DELETE /admin/ejercicios/:id: borra el ejercicio del catálogo para siempre.
+     * Si lo usan rutinas o series de socios, pide confirmación (forzar=1) porque también se borran de ahí.
+     */
+    public function eliminarEjercicio($id) {
+        if (!$this->autorizado()) return;
+
+        $id = (int) $id;
+        $existe = $this->db->prepare('SELECT 1 FROM Ejercicios WHERE ID_ejercicio = :id');
+        $existe->execute(['id' => $id]);
+        if (!$existe->fetchColumn()) {
+            return $this->error('El ejercicio no existe', 404);
+        }
+
+        $usos = $this->usosDeEjercicio($id);
+        $forzar = filter_var($_GET['forzar'] ?? ($this->body()['forzar'] ?? false), FILTER_VALIDATE_BOOLEAN);
+        if (($usos['rutinas'] > 0 || $usos['series'] > 0) && !$forzar) {
+            return $this->error(
+                'El ejercicio está en uso. Confirmá el borrado para continuar.',
+                409,
+                ['dependencias' => $usos, 'requiere_confirmacion_extra' => true]
+            );
+        }
+
+        try {
+            $stmt = $this->db->prepare('DELETE FROM Ejercicios WHERE ID_ejercicio = :id');
+            $stmt->execute(['id' => $id]);
+        } catch (\PDOException $error) {
+            return $this->error('No se pudo borrar el ejercicio', 409);
+        }
+
+        $this->exito(['message' => 'Ejercicio eliminado', 'id' => $id]);
+    }
+
     /** GET /admin/usuarios: usuarios, roles y métricas para refrescar la tabla. */
     public function listarUsuarios() {
         if (!$this->autorizado()) return;

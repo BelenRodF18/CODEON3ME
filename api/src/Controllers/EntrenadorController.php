@@ -66,24 +66,58 @@ class EntrenadorController {
             'SELECT ID_ejercicio AS id, Nombre AS nombre, Grupo_muscular AS grupo FROM Ejercicios WHERE Activo = 1 ORDER BY Nombre'
         )->fetchAll(\PDO::FETCH_ASSOC);
 
+        // Una fila por rutina, con los socios a los que está asignada.
         $rutinas = $this->db->prepare(
-            'SELECT r.ID_rutina AS id, r.Nombre_rutina AS nombre, r.Descripcion AS descripcion, p.Nombre AS socio,
-                    pr.Nombre AS programa, DATE_FORMAT(r.Fecha_creacion, "%d/%m/%Y") AS fecha
+            'SELECT r.ID_rutina AS id, r.Nombre_rutina AS nombre, r.Descripcion AS descripcion, r.ID_programa AS programa_id,
+                    pr.Nombre AS programa, DATE_FORMAT(r.Fecha_creacion, "%d/%m/%Y") AS fecha,
+                    GROUP_CONCAT(DISTINCT p.Nombre ORDER BY p.Nombre SEPARATOR ", ") AS socios,
+                    GROUP_CONCAT(DISTINCT ur.ID_usuario) AS socio_ids
              FROM Rutinas r
-             INNER JOIN Usuario_Rutina ur ON ur.ID_rutina = r.ID_rutina
-             INNER JOIN Persona p ON p.ID_usuario = ur.ID_usuario
+             LEFT JOIN Usuario_Rutina ur ON ur.ID_rutina = r.ID_rutina
+             LEFT JOIN Persona p ON p.ID_usuario = ur.ID_usuario
              LEFT JOIN Programas pr ON pr.ID_programa = r.ID_programa
              WHERE r.ID_entrenador = :entrenador AND r.Activa = 1
-             ORDER BY r.Fecha_creacion DESC'
+             GROUP BY r.ID_rutina, r.Nombre_rutina, r.Descripcion, r.ID_programa, pr.Nombre, r.Fecha_creacion
+             ORDER BY r.Fecha_creacion DESC, r.ID_rutina DESC'
         );
         $rutinas->execute(['entrenador' => $entrenador]);
+        $listaRutinas = $rutinas->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Ejercicios de cada rutina, en el orden en que se hacen.
+        $porRutina = [];
+        $items = $this->db->prepare(
+            'SELECT re.ID_rutina AS rutina, re.ID_ejercicio AS id, e.Nombre AS nombre, e.Activo AS activo, re.Series AS series,
+                    re.Repeticiones AS repeticiones, re.Tiempo_descanso AS descanso, re.Notas AS notas
+             FROM Rutina_Ejercicio re
+             INNER JOIN Rutinas r ON r.ID_rutina = re.ID_rutina
+             INNER JOIN Ejercicios e ON e.ID_ejercicio = re.ID_ejercicio
+             WHERE r.ID_entrenador = :entrenador AND r.Activa = 1
+             ORDER BY re.ID_rutina, re.Orden, re.ID_rutina_ejercicio'
+        );
+        $items->execute(['entrenador' => $entrenador]);
+        foreach ($items->fetchAll(\PDO::FETCH_ASSOC) as $fila) {
+            $rutinaId = (int) $fila['rutina'];
+            unset($fila['rutina']);
+            $fila['id'] = (int) $fila['id'];
+            $fila['activo'] = (int) $fila['activo'] === 1;
+            $fila['series'] = (int) $fila['series'];
+            $fila['descanso'] = (int) $fila['descanso'];
+            $porRutina[$rutinaId][] = $fila;
+        }
+        foreach ($listaRutinas as &$rutina) {
+            $rutina['id'] = (int) $rutina['id'];
+            $rutina['programa_id'] = $rutina['programa_id'] === null ? null : (int) $rutina['programa_id'];
+            $rutina['socio_ids'] = $rutina['socio_ids'] === null ? [] : array_map('intval', explode(',', $rutina['socio_ids']));
+            $rutina['ejercicios'] = $porRutina[$rutina['id']] ?? [];
+        }
+        unset($rutina);
 
         $this->json([
             'status' => 'success',
             'programas' => (new ProgramaModel($this->db))->programasDeEntrenador($entrenador),
             'socios' => $this->sociosDe($entrenador),
             'ejercicios' => $ejercicios,
-            'rutinas' => $rutinas->fetchAll(\PDO::FETCH_ASSOC),
+            'rutinas' => $listaRutinas,
         ]);
     }
 
@@ -272,5 +306,119 @@ class EntrenadorController {
             if ($this->db->inTransaction()) $this->db->rollBack();
             $this->json(['status' => 'error', 'message' => 'No se pudo guardar la rutina'], 500);
         }
+    }
+
+    /** Rutina activa que pertenece a este entrenador, o null. */
+    private function rutinaPropia(int $rutina, int $entrenador): ?array {
+        $stmt = $this->db->prepare('SELECT ID_rutina, ID_programa FROM Rutinas WHERE ID_rutina = :rutina AND ID_entrenador = :entrenador AND Activa = 1');
+        $stmt->execute(['rutina' => $rutina, 'entrenador' => $entrenador]);
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+    }
+
+    /**
+     * PUT /entrenador/rutinas/:id: edita nombre, descripción, programa y ejercicios (en el orden enviado)
+     * y cambia los socios a los que está asignada.
+     */
+    public function actualizarRutina($id) {
+        $entrenador = $this->autorizado();
+        if (!$entrenador) return;
+
+        $id = (int) $id;
+        if (!$this->rutinaPropia($id, $entrenador)) {
+            return $this->json(['status' => 'error', 'message' => 'La rutina no existe o no es tuya'], 404);
+        }
+
+        $in = json_decode(file_get_contents('php://input'), true) ?: [];
+        $programa = (int) ($in['programa_id'] ?? 0) ?: null;
+        $nombre = trim((string) ($in['nombre'] ?? ''));
+        $descripcion = trim((string) ($in['descripcion'] ?? ''));
+        $ejercicios = $in['ejercicios'] ?? [];
+        $socios = array_values(array_unique(array_map('intval', (array) ($in['socio_ids'] ?? []))));
+
+        if ($nombre === '' || !is_array($ejercicios) || !count($ejercicios) || !count($socios)) {
+            return $this->json(['status' => 'error', 'message' => 'Nombre, al menos un socio y al menos un ejercicio son obligatorios'], 400);
+        }
+        foreach ($ejercicios as $ejercicio) {
+            if ((int) ($ejercicio['id'] ?? 0) < 1) {
+                return $this->json(['status' => 'error', 'message' => 'Elegí ejercicios válidos del catálogo'], 400);
+            }
+        }
+
+        // Cada socio tiene que ser suyo y, si hay programa, estar inscripto; sin programa, ser su entrenamiento personal.
+        $propios = [];
+        foreach ($this->sociosDe($entrenador) as $candidato) {
+            $propios[$candidato['id']] = $candidato;
+        }
+        foreach ($socios as $socio) {
+            if (!isset($propios[$socio])) {
+                return $this->json(['status' => 'error', 'message' => 'Hay un socio que no está asignado a este entrenador ni a sus programas'], 403);
+            }
+            if ($programa === null && !$propios[$socio]['personal']) {
+                return $this->json(['status' => 'error', 'message' => $propios[$socio]['nombre'] . ' no es de tu entrenamiento personal: elegí un programa'], 400);
+            }
+            if ($programa !== null && !in_array($programa, $propios[$socio]['programa_ids'], true)) {
+                return $this->json(['status' => 'error', 'message' => $propios[$socio]['nombre'] . ' no está inscripto en ese programa o no lo dirigís vos'], 403);
+            }
+        }
+
+        try {
+            $this->db->beginTransaction();
+
+            $this->db->prepare('UPDATE Rutinas SET Nombre_rutina = :nombre, Descripcion = :descripcion, ID_programa = :programa WHERE ID_rutina = :id')
+                ->execute(['nombre' => $nombre, 'descripcion' => $descripcion, 'programa' => $programa, 'id' => $id]);
+
+            // Ejercicios: se vuelven a cargar en el orden recibido.
+            $this->db->prepare('DELETE FROM Rutina_Ejercicio WHERE ID_rutina = :id')->execute(['id' => $id]);
+            $item = $this->db->prepare(
+                'INSERT INTO Rutina_Ejercicio (ID_rutina, ID_ejercicio, Series, Repeticiones, Orden, Tiempo_descanso, Notas) VALUES (:rutina, :ejercicio, :series, :reps, :orden, :descanso, :notas)'
+            );
+            foreach (array_values($ejercicios) as $orden => $ejercicio) {
+                $item->execute([
+                    'rutina' => $id,
+                    'ejercicio' => (int) $ejercicio['id'],
+                    'series' => max(1, (int) ($ejercicio['series'] ?? 3)),
+                    'reps' => trim((string) ($ejercicio['repeticiones'] ?? '10')),
+                    'orden' => $orden + 1,
+                    'descanso' => max(0, (int) ($ejercicio['descanso'] ?? 90)),
+                    'notas' => trim((string) ($ejercicio['notas'] ?? '')),
+                ]);
+            }
+
+            // Socios: se quitan los que ya no la tienen y se suman los nuevos (los que siguen conservan su estado).
+            $marcas = implode(',', array_fill(0, count($socios), '?'));
+            $quitar = $this->db->prepare("DELETE FROM Usuario_Rutina WHERE ID_rutina = ? AND ID_usuario NOT IN ($marcas)");
+            $quitar->execute(array_merge([$id], $socios));
+            $sumar = $this->db->prepare('INSERT IGNORE INTO Usuario_Rutina (ID_usuario, ID_rutina) VALUES (:socio, :rutina)');
+            foreach ($socios as $socio) {
+                $sumar->execute(['socio' => $socio, 'rutina' => $id]);
+            }
+
+            $this->db->commit();
+            $this->json(['status' => 'success', 'message' => 'Rutina actualizada']);
+        } catch (\Throwable $error) {
+            if ($this->db->inTransaction()) $this->db->rollBack();
+            $this->json(['status' => 'error', 'message' => 'No se pudo actualizar la rutina'], 500);
+        }
+    }
+
+    /** DELETE /entrenador/rutinas/:id: borra la rutina (con sus ejercicios y asignaciones). El progreso de los socios se conserva. */
+    public function eliminarRutina($id) {
+        $entrenador = $this->autorizado();
+        if (!$entrenador) return;
+
+        $id = (int) $id;
+        if (!$this->rutinaPropia($id, $entrenador)) {
+            return $this->json(['status' => 'error', 'message' => 'La rutina no existe o no es tuya'], 404);
+        }
+
+        try {
+            $this->db->prepare('DELETE FROM Rutinas WHERE ID_rutina = :id AND ID_entrenador = :entrenador')
+                ->execute(['id' => $id, 'entrenador' => $entrenador]);
+        } catch (\Throwable $error) {
+            return $this->json(['status' => 'error', 'message' => 'No se pudo borrar la rutina'], 500);
+        }
+
+        $this->json(['status' => 'success', 'message' => 'Rutina eliminada']);
     }
 }

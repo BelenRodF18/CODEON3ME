@@ -28,6 +28,7 @@ const load = async () => {
             <div><h3>${escapeHtml(item.etiqueta)}</h3><p>${escapeHtml(item.descripcion)}</p></div>
             <span class="tag ${item.estado === 'solucionado' ? 'ok' : ''}">${escapeHtml(ESTADOS[item.estado] || item.estado)}</span>
         </div>
+        ${fotoDeReporte(item.foto_path)}
         <small class="socio-meta">${escapeHtml(item.socio)} · ${escapeHtml(item.creado)}</small>
         <div class="fila-control">
             <select class="state" data-id="${item.id}" aria-label="Estado del reporte">
