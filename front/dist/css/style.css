@@ -3168,3 +3168,8 @@ button.socio-avatar:hover, button.socio-avatar:focus-visible { box-shadow: 0 0 0
 .er-socio { display: flex; gap: 9px; align-items: center; font-weight: 400; }
 .er-socio input { width: auto; }
 @media (max-width: 780px) { .rutina-row .rutina-ej { grid-column: 1 / -1; } }
+
+.qr-manual { margin-top: 18px; }
+.qr-manual label { display: block; font-weight: 700; margin-bottom: 6px; }
+.qr-manual-fila { display: flex; gap: 8px; }
+.qr-manual-fila input { flex: 1; min-width: 0; font-family: monospace; font-size: .85rem; padding: 9px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color: inherit; }

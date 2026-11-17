@@ -120,6 +120,7 @@ const makeQr = async () => {
         if (data.status === 'error') throw new Error(data.message);
         $('qr-code').innerHTML = '';
         new QRCode($('qr-code'), { text: data.token, width: 185, height: 185, colorDark: '#0a0d0b', colorLight: '#ffffff' });
+        $('qr-token').value = data.token;
         state.qrSeconds = data.vigencia_segundos || 60;
         $('qr-message').textContent = 'Código listo para presentar en recepción.';
         clearInterval(state.qrTimer);
@@ -319,6 +320,17 @@ $('stop-timer').addEventListener('click', () => {
 });
 // Generar un QR nuevo.
 $('refresh-qr').addEventListener('click', makeQr);
+$('copy-qr').addEventListener('click', async () => {
+    const campo = $('qr-token');
+    if (!campo.value) return;
+    try {
+        await navigator.clipboard.writeText(campo.value);
+        avisoExito('Código copiado', 'Pegalo en el ingreso manual de recepción.');
+    } catch (error) {
+        campo.select();
+        avisoError('No se pudo copiar solo', 'El código quedó seleccionado: copialo con Ctrl+C.');
+    }
+});
 
 // Controles del cronómetro de entrenamiento.
 $('workout-start').addEventListener('click', startWorkoutTimer);
